@@ -18,7 +18,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
             cd /home/ec2-user/oz_03_main-001-BE &&
             git pull origin main &&
-            poetry shell &&
             poetry install &&
             systemctl restart gunicorn_green &&
             sleep 10 &&
