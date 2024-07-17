@@ -2,7 +2,7 @@ name: cd.yml
 on:
   push:
     branches:
-      - test-deploy
+      - main
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
             poetry install &&
             sudo systemctl restart gunicorn_green &&
             sleep 10 &&
-            status_code=$(curl --unix-socket /home/ec2-user/oz_03_main-001-BE/run/gunicorn_green.sock http://localhost -s -o /dev/null -w "%{http_code}")
+            status_code=$(curl --unix-socket /home/ec2-user/oz_03_main-001-BE/run/gunicorn_green.sock http://localhost/hello -s -o /dev/null -w "%{http_code}")
             if [ "$status_code" = "200" ]; then
               echo "Green deployment successful (Status code: $status_code)"
               sudo systemctl restart gunicorn_blue
