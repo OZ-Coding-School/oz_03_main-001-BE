@@ -19,12 +19,12 @@ jobs:
             cd /home/ec2-user/oz_03_main-001-BE &&
             git pull origin main &&
             poetry install &&
-            systemctl restart gunicorn_green &&
+            sudo systemctl restart gunicorn_green &&
             sleep 10 &&
             status_code=$(curl --unix-socket /home/ec2-user/oz_03_main-001-BE/run/gunicorn_green.sock http://localhost -s -o /dev/null -w "%{http_code}")
             if [ "$status_code" = "200" ]; then
               echo "Green deployment successful (Status code: $status_code)"
-              systemctl restart gunicorn_blue
+              sudo systemctl restart gunicorn_blue
             else
               echo "Green deployment failed (Status code: $status_code)"
               exit 1
