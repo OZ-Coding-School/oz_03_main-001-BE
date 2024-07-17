@@ -20,7 +20,7 @@ from django.http import HttpResponse
 
 
 def hello_test(request):
-    return HttpResponse('Hello World!')
+    return HttpResponse('Hello World')
 
 
 urlpatterns = [
