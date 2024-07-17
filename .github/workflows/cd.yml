@@ -2,7 +2,11 @@ name: cd.yml
 on:
   push:
     branches:
-      - test-deploy
+      - develop
+      - feature/*
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
