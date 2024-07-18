@@ -1,8 +1,10 @@
-name: cd.yml
+name: Dosirock CD
+
 on:
   push:
     branches:
       - main
+
 
 jobs:
   deploy:
