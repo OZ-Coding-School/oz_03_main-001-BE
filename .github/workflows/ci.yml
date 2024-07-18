@@ -3,7 +3,7 @@ name: Dosirock CI
 on:
   push:
     branches:
-      - dev
+      - develop
   pull_request:
 
 jobs:
@@ -39,11 +39,10 @@ jobs:
           sudo rm /etc/localtime
           sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
-      - name: Start PostgreSQL
+      - name: Test PostgreSQL connection
         run: |
-          sudo systemctl start postgresql
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${{ env.DB_PASSWORD }}';"
-          sudo -u postgres psql -c "CREATE DATABASE ${{ env.DB_DATABASE }};"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "SELECT 1;"
+          echo "PostgreSQL connection successful."
 
       - name: Install Poetry
         run: |
