@@ -27,7 +27,10 @@ DJANGO_SYSTEM_APPS = [
 ]
 
 CUSTOM_USER_APPS = [
+    "rest_framework",
+    "drf_spectacular",
     "common.apps.CommonConfig",
+    "menus.apps.MenusConfig",
 ]
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS
@@ -43,6 +46,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "dosirock.urls"
+
+
+REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"}
+
 
 TEMPLATES = [
     {
