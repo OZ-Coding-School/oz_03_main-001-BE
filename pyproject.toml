@@ -12,7 +12,7 @@ gunicorn = "^22.0.0"
 psycopg2-binary = "^2.9.9"
 djangorestframework = "^3.15.2"
 drf-spectacular = "^0.27.2"
-
+python-dotenv = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -41,6 +41,10 @@ ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "manage"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "*.settings.*"
 ignore_errors = true
 
 [tool.django-stubs]
