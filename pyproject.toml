@@ -24,6 +24,7 @@ isort = "^5.13.2"
 mypy = "^1.10.0"
 django-stubs = "^5.0.2"
 
+djangorestframework-stubs = "^3.15.0"
 [tool.black]
 line-length = 120
 
@@ -33,7 +34,9 @@ profile = "black"
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 python_version = 3.12
+ignore_missing_imports = true
 strict = true
+follow_imports = "silent"
 
 [[tool.mypy.overrides]]
 module = "*.migrations.*"
