@@ -26,16 +26,15 @@ class MenuList(APIView):
         if category_name == "":
             return Response("category input error", status=status.HTTP_400_BAD_REQUEST)
 
-        menus = Menu.objects.filter(category=category_name).order_by("-id")
+        menus = Menu.objects.filter(category=category_name).order_by("-id")[offset : offset + size]
         # .prefetch_related("category_set")[offset:offset + size]
         serializer = MenuSerializer(menus, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
-        if not request.user.is_authenticated or request.user.status != 'store':
-            return Response({'success': False},
-                            status=status.HTTP_403_FORBIDDEN)
+        if not request.user.is_authenticated or request.user.status != "store":
+            return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = MenuSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,15 +48,14 @@ class MenuDetail(APIView):
         try:
             menu = Menu.objects.get(pk=pk)
         except Menu.DoesNotExist:
-            return Response({'success': False}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = MenuSerializer(menu)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int) -> Response:
-        if not request.user.is_authenticated or request.user.status != 'store':
-            return Response({'success': False},
-                            status=status.HTTP_403_FORBIDDEN)
+        if not request.user.is_authenticated or request.user.status != "store":
+            return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = MenuSerializer(data=request.data)
         if serializer.is_valid():
@@ -68,4 +66,4 @@ class MenuDetail(APIView):
     def delete(self, request: Request, pk: int) -> Response:
         menu = Menu.objects.get(pk=pk)
         menu.delete()
-        return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
