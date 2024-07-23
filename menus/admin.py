@@ -4,5 +4,5 @@ from .models import Menu
 
 
 @admin.register(Menu)
-class MenuAdmin(admin.ModelAdmin): # type: ignore
+class MenuAdmin(admin.ModelAdmin):  # type: ignore
     pass
