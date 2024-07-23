@@ -22,3 +22,9 @@ class Menu(CommonModel):
         choices=Category.choices,
         default=Category.CHAN,
     )
+
+
+class MenuDetailCategory(CommonModel):
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    allergy = models.ForeignKey('allergy.Allergy', on_delete=models.CASCADE)
+    detail_category = models.CharField(max_length=30)
