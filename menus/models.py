@@ -1,7 +1,6 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
-from common.models import CommonModel
+from common.models import CommonModel, Allergy
 
 
 class Menu(CommonModel):
@@ -12,19 +11,19 @@ class Menu(CommonModel):
     price = models.PositiveIntegerField(default=0)
 
     class Category(models.TextChoices):
-        BOB = "bo", _("bob")
-        GUK = "gu", _("guk")
-        CHAN = "ch", _("chan")
-        SIDE = "si", _("side")
+        BOB = "bob", "밥"
+        GUK = "guk", "국"
+        CHAN = "chan", "반찬"
+        SIDE = "side", "사이드"
 
     category = models.CharField(
-        max_length=2,
+        max_length=4,
         choices=Category.choices,
         default=Category.CHAN,
     )
 
 
 class MenuDetailCategory(CommonModel):
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
-    allergy = models.ForeignKey('allergy.Allergy', on_delete=models.CASCADE)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='menu_details')
+    allergy = models.ForeignKey(Allergy, on_delete=models.CASCADE, related_name='allergy_details', null=True, blank=True)
     detail_category = models.CharField(max_length=30)
