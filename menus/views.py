@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Menu
-from .serializers import MenuSerializer, MenuWithDetailSerializer
+from .serializers import MenuWithDetailSerializer, MenuSerializer
 
 
 class MenuList(APIView):
@@ -21,10 +21,10 @@ class MenuList(APIView):
         if category == "":
             return Response("category input error", status=status.HTTP_400_BAD_REQUEST)
 
-        menus = Menu.objects.filter(category=category).order_by("-id")[offset : offset + size]
-        # .prefetch_related("category_set")[offset:offset + size]
-        serializer = MenuSerializer(menus, many=True)
+        menus = Menu.objects.filter(category=category).order_by("-id") \
+                    .prefetch_related("menu_details")[offset:offset + size]
 
+        serializer = MenuWithDetailSerializer(menus, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
@@ -45,14 +45,14 @@ class MenuDetail(APIView):
         except Menu.DoesNotExist:
             return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MenuSerializer(menu)
+        serializer = MenuWithDetailSerializer(menu)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int) -> Response:
         if not request.user.is_authenticated or request.user.status != "store":
             return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = MenuSerializer(data=request.data)
+        serializer = MenuWithDetailSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
