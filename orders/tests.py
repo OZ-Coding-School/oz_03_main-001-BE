@@ -3,8 +3,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from utils.test_helper import create_menu
 from orders.serializers import OrderSerializer
+from utils.test_helper import create_menu
+
 
 class OrderTestCase(APITestCase):
     def setUp(self):
@@ -31,14 +32,17 @@ class OrderTestCase(APITestCase):
                     "lunch": {
                         "name": "도시락1",
                         "description": "신선한 도시락",
+                        "total_kcal": 1000,
                         "menus": [
                             {
                                 "id": 1,
                                 "quantity": 1,
+                                "kcal": 400,
                             },
                             {
                                 "id": 2,
                                 "quantity": 2,
+                                "kcal": 600,
                             },
                         ],
                     },
@@ -49,14 +53,17 @@ class OrderTestCase(APITestCase):
                         "name": "도시락2",
                         "description": "신선한 도시락2",
                         "image_url": "http://example.com/image.jpg",
+                        "total_kcal": 900,
                         "menus": [
                             {
                                 "id": 3,
                                 "quantity": 1,
+                                "kcal": 400,
                             },
                             {
                                 "id": 4,
                                 "quantity": 1,
+                                "kcal": 500,
                             },
                         ],
                     },
@@ -69,7 +76,7 @@ class OrderTestCase(APITestCase):
             self.order = serializer.save()
 
     def test_order_list_get(self):
-        url = reverse('order-list')
+        url = reverse("order-list")
 
         with self.assertNumQueries(4):
             response = self.client.get(url)

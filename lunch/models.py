@@ -10,8 +10,9 @@ class Lunch(CommonModel):
     name = models.CharField(max_length=100, default="도시락")
     description = models.TextField(null=True, blank=True)
     image_url = models.URLField(null=True, blank=True)
-    total_price = models.PositiveIntegerField(default=0, editable=False)
+    total_price = models.PositiveIntegerField(default=0)
     menus = models.ManyToManyField("menus.Menu", through="lunch.LunchMenu", blank=True)
+    total_kcal = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
         return self.name
@@ -21,6 +22,7 @@ class LunchMenu(CommonModel):
     menu = models.ForeignKey("menus.Menu", on_delete=models.CASCADE)
     lunch = models.ForeignKey(Lunch, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    kcal = models.PositiveIntegerField(default=0)
 
     class Meta:
         constraints = [

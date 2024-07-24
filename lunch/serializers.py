@@ -10,7 +10,7 @@ class LunchMenuSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LunchMenu
-        fields = ["id", "quantity"]
+        fields = ["id", "quantity", "kcal"]
 
     def validate_menu(self, value):
         if not Menu.objects.filter(id=value).exists():

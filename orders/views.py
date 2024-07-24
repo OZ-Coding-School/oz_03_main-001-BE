@@ -17,8 +17,7 @@ class OrderList(APIView):
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
 
-        orders = Order.objects.prefetch_related('items__lunch__menus') \
-                              .order_by('-id')[offset: offset + size]
+        orders = Order.objects.prefetch_related("items__lunch__menus").order_by("-id")[offset : offset + size]
 
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
