@@ -1,6 +1,6 @@
 from django.db import models
 
-from common.models import CommonModel, Allergy
+from common.models import Allergy, CommonModel
 
 
 class Menu(CommonModel):
@@ -24,6 +24,8 @@ class Menu(CommonModel):
 
 
 class MenuDetailCategory(CommonModel):
-    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name='menu_details')
-    allergy = models.ForeignKey(Allergy, on_delete=models.CASCADE, related_name='allergy_details', null=True, blank=True)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name="menu_details")
+    allergy = models.ForeignKey(
+        Allergy, on_delete=models.CASCADE, related_name="allergy_details", null=True, blank=True
+    )
     detail_category = models.CharField(max_length=30)

@@ -4,14 +4,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Menu
-from .serializers import MenuWithDetailSerializer, MenuSerializer
+from .serializers import MenuWithDetailSerializer
 
 
 class MenuList(APIView):
 
     def get(self, request: Request) -> Response:
         page = int(request.GET.get("page", "1"))
-        size = int(request.GET.get("size", "20"))
+        size = int(request.GET.get("size", "10"))
         category = request.GET.get("category", "bob").lower()
         offset = (page - 1) * size
 
@@ -21,8 +21,11 @@ class MenuList(APIView):
         if category == "":
             return Response("category input error", status=status.HTTP_400_BAD_REQUEST)
 
-        menus = Menu.objects.filter(category=category).order_by("-id") \
-                    .prefetch_related("menu_details")[offset:offset + size]
+        menus = (
+            Menu.objects.filter(category=category)
+            .order_by("-id")
+            .prefetch_related("menu_details")[offset : offset + size]
+        )
 
         serializer = MenuWithDetailSerializer(menus, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -49,13 +52,19 @@ class MenuDetail(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int) -> Response:
-        if not request.user.is_authenticated or request.user.status != "store":
-            return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = MenuWithDetailSerializer(data=request.data)
+        # if not request.user.is_authenticated or request.user.status != "store":
+        #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            menu = Menu.objects.get(pk=pk)
+        except Menu.DoesNotExist:
+            return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MenuWithDetailSerializer(menu, data=request.data, partial=False)
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: Request, pk: int) -> Response:

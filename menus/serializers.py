@@ -1,48 +1,43 @@
-from rest_framework import serializers
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from rest_framework import serializers
+
 from common.models import Allergy
 from common.serializers import AllergySerializer
 
 from .models import Menu, MenuDetailCategory
 
-class MenuSerializer(serializers.ModelSerializer[Menu]):
-    class Meta:
-        model = Menu
-        fields = "__all__"
-
 
 class MenuDetailCategorySerializer(serializers.ModelSerializer[MenuDetailCategory]):
     allergy = serializers.CharField(required=False, allow_null=True, allow_blank=True, write_only=True)
-    allergy_info = AllergySerializer(source='allergy', read_only=True)
+    allergy_info = AllergySerializer(source="allergy", read_only=True)
+    menu: Menu = serializers.PrimaryKeyRelatedField(read_only=True)
+    id = serializers.IntegerField(required=False)
 
     class Meta:
         model = MenuDetailCategory
-        fields = ['allergy', 'allergy_info', 'detail_category']
+        fields = ["id", "allergy", "allergy_info", "detail_category", "menu"]
 
-    def create(self, validated_data):
-        allergy_name = validated_data.pop('allergy', None)
+    def create(self, validated_data) -> MenuDetailCategory:
+        allergy_name = validated_data.pop("allergy", None)
         instance = MenuDetailCategory.objects.create(**validated_data)
         if allergy_name:
-            allergy = Allergy.objects.get(name=allergy_name)
-            print(allergy)
-            # allergy = get_object_or_404(Allergy, name=allergy_name)
-            # print("zz, ", allergy)
+            allergy = get_object_or_404(Allergy, name=allergy_name)
             instance.allergy = allergy
             instance.save()
         return instance
 
 
-class MenuWithDetailSerializer(serializers.ModelSerializer):
+class MenuWithDetailSerializer(serializers.ModelSerializer[Menu]):
     menu_details = MenuDetailCategorySerializer(many=True)
 
     class Meta:
         model = Menu
-        fields = ["name", "description", "kcal", "image_url", "price", "category", "menu_details"]
+        fields = ["id", "name", "description", "kcal", "image_url", "price", "category", "menu_details"]
 
+    @transaction.atomic
     def create(self, validated_data) -> Menu:
-        print("hi", validated_data)
         menu_details_data = validated_data.pop("menu_details")
-        print("hi2", menu_details_data)
         menu = Menu.objects.create(**validated_data)
 
         for menu_detail_data in menu_details_data:
@@ -51,14 +46,27 @@ class MenuWithDetailSerializer(serializers.ModelSerializer):
                 serializer.save(menu=menu)
         return menu
 
-            #
-            # allergy_label = menu_detail_data.pop("allergy", None)
-            # print(allergy_label)
-            # if allergy_label:
-            #     allergy = get_object_or_404(Allergy, name=allergy_label)
-            #     menu_detail_data["allergy"] = allergy
-            #     print("Zzxzx", menu_detail_data)
-            # else:
-            #     menu_detail_data["allergy"] = None
-            # MenuDetailCategory.objects.create(menu=menu, **menu_detail_data)
-        # return menu
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        menu_details_data = validated_data.pop("menu_details", [])
+        instance.name = validated_data.get("name", instance.name)
+        instance.description = validated_data.get("description", instance.description)
+        instance.kcal = validated_data.get("kcal", instance.kcal)
+        instance.image_url = validated_data.get("image_url", instance.image_url)
+        instance.price = validated_data.get("price", instance.price)
+        instance.category = validated_data.get("category", instance.category)
+        instance.save()
+
+        for detail_data in menu_details_data:
+            detail_id = detail_data.get("id")
+
+            if detail_id:
+                detail_instance = MenuDetailCategory.objects.get(id=detail_id, menu=instance)
+                allergy = get_object_or_404(Allergy, name=detail_data.get("allergy"))
+                detail_instance.allergy = detail_data.get(allergy, detail_instance.allergy)
+                detail_instance.detail_category = detail_data.get("detail_category", detail_instance.detail_category)
+                detail_instance.save()
+            else:
+                MenuDetailCategory.objects.create(menu=instance, **detail_data)
+
+        return instance
