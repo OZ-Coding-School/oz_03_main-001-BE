@@ -31,6 +31,8 @@ CUSTOM_USER_APPS = [
     "drf_spectacular",
     "common.apps.CommonConfig",
     "menus.apps.MenusConfig",
+    "lunch.apps.LunchConfig",
+    "orders.apps.OrdersConfig",
 ]
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS

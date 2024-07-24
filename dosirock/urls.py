@@ -10,9 +10,11 @@ def hello_test(request: HttpRequest) -> HttpResponse:
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/schema", SpectacularAPIView.as_view(), name="schema"),
-    path("api/v1/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger_ui"),
-    path("api/v1/schema/redoc/", SpectacularSwaggerView.as_view(url_name="schema"), name="redoc"),
+    path("v1/schema", SpectacularAPIView.as_view(), name="schema"),
+    path("v1/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger_ui"),
+    path("v1/schema/redoc/", SpectacularSwaggerView.as_view(url_name="schema"), name="redoc"),
     path("hello/", hello_test),
-    path("api/v1/menus/", include("menus.urls")),
+    path("v1/menus/", include("menus.urls")),
+    path("v1/lunch/", include("lunch.urls")),
+    path("v1/orders/", include("orders.urls")),
 ]
