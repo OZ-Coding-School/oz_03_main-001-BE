@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -102,3 +104,13 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+KAKAO_CLIENT_ID = os.environ.get("KAKAO_CLIENT_ID")
+KAKAO_REDIRECT_URL = os.environ.get("KAKAO_REDIRECT_URL")
+KAKAO_AUTH_URL = os.environ.get("KAKAO_AUTH_URL")
+KAKAO_TOKEN_URL = os.environ.get("KAKAO_TOKEN_URL")
+KAKAO_PROFILE_URL = os.environ.get("KAKAO_PROFILE_URL")
+KAKAO_CLIENT_SECRET = os.environ.get("KAKAO_CLIENT_SECRET")
+
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
