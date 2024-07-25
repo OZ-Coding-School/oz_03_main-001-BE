@@ -37,10 +37,12 @@ class OrderTestCase(APITestCase):
                             {
                                 "id": 1,
                                 "quantity": 1,
+                                "kcal": 500,
                             },
                             {
                                 "id": 2,
                                 "quantity": 2,
+                                "kcal": 600,
                             },
                         ],
                     },
@@ -56,10 +58,12 @@ class OrderTestCase(APITestCase):
                             {
                                 "id": 3,
                                 "quantity": 1,
+                                "kcal": 444,
                             },
                             {
                                 "id": 4,
                                 "quantity": 1,
+                                "kcal": 444,
                             },
                         ],
                     },

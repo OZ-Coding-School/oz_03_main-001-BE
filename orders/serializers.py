@@ -52,7 +52,12 @@ class OrderSerializer(serializers.ModelSerializer):
             lunch = Lunch.objects.create(**lunch_data)
 
             for menu_data in menus_data:
-                LunchMenu.objects.create(lunch=lunch, menu_id=menu_data["id"], quantity=menu_data["quantity"])
+                LunchMenu.objects.create(
+                    lunch_id=lunch.pk,
+                    menu_id=menu_data["id"],
+                    quantity=menu_data["quantity"],
+                    kcal=menu_data["kcal"] * menu_data["quantity"],
+                )
 
             OrderItem.objects.create(order=order, lunch=lunch, **item_data)
 

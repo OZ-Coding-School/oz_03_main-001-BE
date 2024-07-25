@@ -5,15 +5,11 @@ from .models import Lunch, LunchMenu
 
 class LunchMenuSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    kcal = serializers.SerializerMethodField(read_only=True)
     name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = LunchMenu
         fields = ["id", "quantity", "kcal", "name"]
-
-    def get_kcal(self, obj):
-        return obj.menu.kcal
 
     def get_name(self, obj):
         return obj.menu.name
