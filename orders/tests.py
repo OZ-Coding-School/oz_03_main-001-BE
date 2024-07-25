@@ -81,7 +81,6 @@ class OrderTestCase(APITestCase):
         with self.assertNumQueries(4):
             response = self.client.get(url)
 
-        print(response.data[0])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
@@ -92,3 +91,11 @@ class OrderTestCase(APITestCase):
         self.assertEqual(response.data["status"], 1)
         self.assertEqual(response.data["total_price"], 17000)
         self.assertEqual(response.data["is_disposable"], False)
+
+    def test_order_detail_get(self):
+        url = reverse("order-detail", kwargs={"pk": self.order.pk})
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['items'][1]['lunch']['id'], 30)
+

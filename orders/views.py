@@ -14,9 +14,14 @@ class OrderList(APIView):
         size = int(request.GET.get("size", "10"))
         offset = (page - 1) * size
 
+        # TODO: USER 추가 시 filter 적용
+        # user_id = request.user.id
+        # total_count = Order.objects.count()
+
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
 
+        # orders = Order.objects.filter(user_id=user_id).prefetch_related("items__lunch__menus").order_by("-id")[offset : offset + size]
         orders = Order.objects.prefetch_related("items__lunch__menus").order_by("-id")[offset : offset + size]
 
         serializer = OrderSerializer(orders, many=True)
@@ -56,7 +61,7 @@ class OrderDetail(APIView):
         except Order.DoesNotExist:
             return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = OrderSerializer(Order, data=request.data, partial=False)
+        serializer = OrderSerializer(Order, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

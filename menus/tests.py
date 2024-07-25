@@ -54,7 +54,8 @@ class MenuAPITestCase(APITestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), Menu.objects.count())
+        self.assertEqual(len(res.data), 4)
+        self.assertEqual(res.data['current_page'], 1)
 
     def test_menu_detail_get(self) -> None:
         url = reverse("menu-detail", kwargs={"pk": self.menu.pk})
