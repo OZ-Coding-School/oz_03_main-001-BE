@@ -6,11 +6,6 @@ import json
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-with open(BASE_DIR.parent / ".config_secret" / "secret.json") as f:
-    config_secret_str = f.read()
-
-SECRET = json.loads(config_secret_str)
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -40,6 +35,7 @@ THIRD_PARTY_APPS = ["rest_framework"]
 CUSTOM_USER_APPS = [
     "common.apps.CommonConfig",
     "oauth",
+    "users",
 ]
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS + THIRD_PARTY_APPS
@@ -116,11 +112,6 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# OAuth
-KAKAO_CLIENT_ID = SECRET["kakao"]["client_id"]
-KAKAO_SECRET = SECRET["kakao"]["secret"]
-KAKAO_REDIRECT_URI = SECRET["kakao"]["redirect"]
-KAKAO_LOGIN_URL = "https://kauth.kakao.com/oauth/authorize"
-KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token"
-KAKAO_PROFILE_URL = "https://kauth.kakao.com/v2/user/me"
-KAKAO_LOGOUT_URL = "https://kauth.kakao.com/logout"
+AUTH_USER_MODEL = "users.User"
+
+
