@@ -1,9 +1,15 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+with open(BASE_DIR.parent / ".config_secret" / "secret.json") as f:
+    config_secret_str = f.read()
+
+SECRET = json.loads(config_secret_str)
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,13 +32,18 @@ DJANGO_SYSTEM_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
+
+THIRD_PARTY_APPS = ["rest_framework"]
 
 CUSTOM_USER_APPS = [
     "common.apps.CommonConfig",
+    "oauth",
 ]
 
-INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS
+INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS + THIRD_PARTY_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -105,12 +116,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-KAKAO_CLIENT_ID = os.environ.get("KAKAO_CLIENT_ID")
-KAKAO_REDIRECT_URL = os.environ.get("KAKAO_REDIRECT_URL")
-KAKAO_AUTH_URL = os.environ.get("KAKAO_AUTH_URL")
-KAKAO_TOKEN_URL = os.environ.get("KAKAO_TOKEN_URL")
-KAKAO_PROFILE_URL = os.environ.get("KAKAO_PROFILE_URL")
-KAKAO_CLIENT_SECRET = os.environ.get("KAKAO_CLIENT_SECRET")
-
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+# OAuth
+KAKAO_CLIENT_ID = SECRET["kakao"]["client_id"]
+KAKAO_SECRET = SECRET["kakao"]["secret"]
+KAKAO_REDIRECT_URI = SECRET["kakao"]["redirect"]
+KAKAO_LOGIN_URL = "https://kauth.kakao.com/oauth/authorize"
+KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token"
+KAKAO_PROFILE_URL = "https://kauth.kakao.com/v2/user/me"
+KAKAO_LOGOUT_URL = "https://kauth.kakao.com/logout"
