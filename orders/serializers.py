@@ -7,11 +7,12 @@ from orders.models import Order, OrderItem
 
 
 class OrderLunchSerializer(serializers.ModelSerializer):
-    menus = LunchMenuSerializer(many=True)
+    menus = LunchMenuSerializer(many=True, write_only=True)
+    lunch_menu = LunchMenuSerializer(many=True, read_only=True)
 
     class Meta:
         model = Lunch
-        fields = ["id", "name", "description", "menus", "total_kcal"]
+        fields = ["id", "name", "description", "total_kcal", "menus", "lunch_menu"]
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -56,21 +57,3 @@ class OrderSerializer(serializers.ModelSerializer):
             OrderItem.objects.create(order=order, lunch=lunch, **item_data)
 
         return order
-
-
-class OrderDetailSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True)
-
-    class Meta:
-        model = Order
-        fields = [
-            "user",
-            "request_things",
-            "name",
-            "status",
-            "address",
-            "contact_number",
-            "is_disposable",
-            "total_price",
-            "items",
-        ]

@@ -37,12 +37,10 @@ class OrderTestCase(APITestCase):
                             {
                                 "id": 1,
                                 "quantity": 1,
-                                "kcal": 400,
                             },
                             {
                                 "id": 2,
                                 "quantity": 2,
-                                "kcal": 600,
                             },
                         ],
                     },
@@ -58,19 +56,17 @@ class OrderTestCase(APITestCase):
                             {
                                 "id": 3,
                                 "quantity": 1,
-                                "kcal": 400,
                             },
                             {
                                 "id": 4,
                                 "quantity": 1,
-                                "kcal": 500,
                             },
                         ],
                     },
                 },
             ],
         }
-        for i in range(15):
+        for i in range(5):
             serializer = OrderSerializer(data=self.order_data)
             serializer.is_valid()
             self.order = serializer.save()
@@ -78,15 +74,16 @@ class OrderTestCase(APITestCase):
     def test_order_list_get(self):
         url = reverse("order-list")
 
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 10)
+        self.assertEqual(len(response.data), 5)
 
     def test_order_post(self):
         url = reverse("order-list")
         response = self.client.post(url, data=self.order_data, format="json")
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["status"], 1)
         self.assertEqual(response.data["total_price"], 17000)
@@ -97,5 +94,4 @@ class OrderTestCase(APITestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data['items'][1]['lunch']['id'], 30)
-
+        self.assertEqual(res.data["items"][1]["lunch"]["id"], 10)

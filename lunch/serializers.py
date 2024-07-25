@@ -1,21 +1,22 @@
 from rest_framework import serializers
 
-from menus.models import Menu
-
 from .models import Lunch, LunchMenu
 
 
 class LunchMenuSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
+    kcal = serializers.SerializerMethodField(read_only=True)
+    name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = LunchMenu
-        fields = ["id", "quantity", "kcal"]
+        fields = ["id", "quantity", "kcal", "name"]
 
-    def validate_menu(self, value):
-        if not Menu.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Invalid menu ID")
-        return value
+    def get_kcal(self, obj):
+        return obj.menu.kcal
+
+    def get_name(self, obj):
+        return obj.menu.name
 
 
 class LunchSerializer(serializers.ModelSerializer[Lunch]):

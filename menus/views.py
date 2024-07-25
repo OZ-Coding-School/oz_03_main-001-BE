@@ -33,12 +33,10 @@ class MenuList(APIView):
 
         serializer = MenuWithDetailSerializer(menus, many=True)
 
-        return Response({
-            'total_count': total_count,
-            'total_pages': total_pages,
-            'current_page': page,
-            'results': serializer.data
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {"total_count": total_count, "total_pages": total_pages, "current_page": page, "results": serializer.data},
+            status=status.HTTP_200_OK,
+        )
 
         # return Response(serializer.data, status=status.HTTP_200_OK)
 

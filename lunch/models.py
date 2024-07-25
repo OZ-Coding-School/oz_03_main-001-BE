@@ -11,7 +11,6 @@ class Lunch(CommonModel):
     description = models.TextField(null=True, blank=True)
     image_url = models.URLField(null=True, blank=True)
     total_price = models.PositiveIntegerField(default=0)
-    menus = models.ManyToManyField("menus.Menu", through="lunch.LunchMenu", blank=True)
     total_kcal = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
@@ -19,8 +18,8 @@ class Lunch(CommonModel):
 
 
 class LunchMenu(CommonModel):
-    menu = models.ForeignKey("menus.Menu", on_delete=models.CASCADE)
-    lunch = models.ForeignKey(Lunch, on_delete=models.CASCADE)
+    menu = models.ForeignKey("menus.Menu", on_delete=models.CASCADE, related_name="lunch_menu")
+    lunch = models.ForeignKey(Lunch, on_delete=models.CASCADE, related_name="lunch_menu")
     quantity = models.PositiveIntegerField(default=1)
     kcal = models.PositiveIntegerField(default=0)
 
