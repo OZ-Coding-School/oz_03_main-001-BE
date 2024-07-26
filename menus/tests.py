@@ -97,5 +97,3 @@ class MenuAPITestCase(APITestCase):
         self.assertEqual(menu_details.count(), 2)
         self.assertEqual(menu_details.first().allergy.name, "메밀")
         self.assertIsNone(menu_details.last().allergy)
-
-        print(response.data)
