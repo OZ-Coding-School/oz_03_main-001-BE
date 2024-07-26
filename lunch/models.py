@@ -12,6 +12,7 @@ class Lunch(CommonModel):
     image_url = models.URLField(null=True, blank=True)
     total_price = models.PositiveIntegerField(default=0)
     total_kcal = models.PositiveIntegerField(default=0)
+    menus = models.ManyToManyField('menus.Menu', through='lunch.LunchMenu', blank=True)
 
     def __str__(self) -> str:
         return self.name

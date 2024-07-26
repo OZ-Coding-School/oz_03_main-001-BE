@@ -62,3 +62,9 @@ class OrderSerializer(serializers.ModelSerializer):
             OrderItem.objects.create(order=order, lunch=lunch, **item_data)
 
         return order
+
+    def update(self, instance, validated_data):
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+
+        return instance
