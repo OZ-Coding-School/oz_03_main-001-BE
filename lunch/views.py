@@ -14,13 +14,19 @@ class LunchList(APIView):
         size = int(request.GET.get("size", "10"))
         offset = (page - 1) * size
 
+        total_count = Lunch.objects.count()
+        total_pages = (total_count // size) + 1
+
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
 
-        lunches = Lunch.objects.order_by("-id")[offset : offset + size]
+        lunches = Lunch.objects.order_by("-id").prefetch_related("lunch_menu__menu")[offset : offset + size]
 
         serializer = LunchSerializer(lunches, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"total_count": total_count, "total_pages": total_pages, "current_page": page, "results": serializer.data},
+            status=status.HTTP_200_OK,
+        )
 
     def post(self, request: Request) -> Response:
         # if not request.user.is_authenticated or request.user.status != "store":

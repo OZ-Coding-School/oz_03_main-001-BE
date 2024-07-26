@@ -16,7 +16,9 @@ class OrderList(APIView):
 
         # TODO: USER 추가 시 filter 적용
         # user_id = request.user.id
-        # total_count = Order.objects.count()
+
+        total_count = Order.objects.count()
+        total_pages = (total_count // size) + 1
 
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
@@ -28,7 +30,10 @@ class OrderList(APIView):
         ]
 
         serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"total_count": total_count, "total_pages": total_pages, "current_page": page, "results": serializer.data},
+            status=status.HTTP_200_OK,
+        )
 
     def post(self, request: Request) -> Response:
         # if not request.user.is_authenticated or request.user.status != "store":
