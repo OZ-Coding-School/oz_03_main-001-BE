@@ -35,7 +35,8 @@ class LunchAPITestCase(APITestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), 10)
+        self.assertEqual(len(res.data), 4)
+        self.assertEqual(len(res.data["results"]), 10)
 
     def test_lunch_post(self):
         lunch_data = {

@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -74,7 +76,7 @@ class OrderTestCase(APITestCase):
                 },
             ],
         }
-        for i in range(5):
+        for i in range(2):
             serializer = OrderSerializer(data=self.order_data)
             serializer.is_valid()
             self.order = serializer.save()
@@ -82,11 +84,13 @@ class OrderTestCase(APITestCase):
     def test_order_list_get(self):
         url = reverse("order-list")
 
-        with self.assertNumQueries(5):
+        # 로거 인스턴스 생성
+        with self.assertNumQueries(6):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 5)
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(len(response.data['results']), 5)
 
     def test_order_post(self):
         url = reverse("order-list")
