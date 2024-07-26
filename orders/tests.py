@@ -3,9 +3,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .serializers import OrderSerializer
 from utils.test_helper import create_menu
+
 from .models import Order
+from .serializers import OrderSerializer
 
 
 class OrderTestCase(APITestCase):
@@ -34,6 +35,7 @@ class OrderTestCase(APITestCase):
                         "name": "도시락1",
                         "description": "신선한 도시락",
                         "total_kcal": 1000,
+                        "total_price": 10000,
                         "menus": [
                             {
                                 "id": 1,
@@ -55,6 +57,7 @@ class OrderTestCase(APITestCase):
                         "description": "신선한 도시락2",
                         "image_url": "http://example.com/image.jpg",
                         "total_kcal": 900,
+                        "total_price": 7000,
                         "menus": [
                             {
                                 "id": 3,
@@ -131,7 +134,8 @@ class OrderTestCase(APITestCase):
                             },
                         ],
                     },
-                },{
+                },
+                {
                     "quantity": 2,
                     "lunch": {
                         "name": "도시락2",
@@ -151,8 +155,8 @@ class OrderTestCase(APITestCase):
                             },
                         ],
                     },
-                }
-            ]
+                },
+            ],
         }
 
         url = reverse("order-detail", kwargs={"pk": self.order.pk})
@@ -173,5 +177,4 @@ class OrderTestCase(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
         with self.assertRaises(Order.DoesNotExist):
-            order = Order.objects.get(pk=self.order.pk)
-
+            Order.objects.get(pk=self.order.pk)

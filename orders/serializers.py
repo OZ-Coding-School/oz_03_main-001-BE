@@ -12,7 +12,7 @@ class OrderLunchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lunch
-        fields = ["id", "name", "description", "total_kcal", "menus", "lunch_menu"]
+        fields = ["id", "name", "description", "total_price", "menus", "lunch_menu"]
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -52,19 +52,21 @@ class OrderSerializer(serializers.ModelSerializer):
             lunch = Lunch.objects.create(**lunch_data)
 
             for menu_data in menus_data:
-                LunchMenu.objects.create(
+                lm = LunchMenu.objects.create(
                     lunch_id=lunch.pk,
                     menu_id=menu_data["id"],
                     quantity=menu_data["quantity"],
-                    kcal=menu_data["kcal"] * menu_data["quantity"],
                 )
+
+                lm.kcal = lm.menu.kcal * lm.quantity
+                lm.save()
 
             OrderItem.objects.create(order=order, lunch=lunch, **item_data)
 
         return order
 
     def update(self, instance, validated_data):
-        instance.status = validated_data.get('status', instance.status)
+        instance.status = validated_data.get("status", instance.status)
         instance.save()
 
         return instance

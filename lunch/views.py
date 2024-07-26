@@ -28,8 +28,8 @@ class LunchList(APIView):
 
         serializer = LunchSerializer(data=request.data)
         if serializer.is_valid():
-            menu = serializer.save()
-            return Response(LunchSerializer(menu).data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -49,17 +49,17 @@ class LunchDetail(APIView):
         #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            menu = Lunch.objects.get(pk=pk)
+            lunch = Lunch.objects.get(pk=pk)
         except Lunch.DoesNotExist:
             return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = LunchSerializer(menu, data=request.data, partial=False)
+        serializer = LunchSerializer(lunch, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: Request, pk: int) -> Response:
-        menu = Lunch.objects.get(pk=pk)
-        menu.delete()
+        lunch = Lunch.objects.get(pk=pk)
+        lunch.delete()
         return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)

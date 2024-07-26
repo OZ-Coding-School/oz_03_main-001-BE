@@ -8,6 +8,13 @@ from common.serializers import AllergySerializer
 from .models import Menu, MenuDetailCategory
 
 
+class MenuSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Menu
+        fields = "__all__"
+
+
 class MenuDetailCategorySerializer(serializers.ModelSerializer[MenuDetailCategory]):
     allergy = serializers.CharField(required=False, allow_null=True, allow_blank=True, write_only=True)
     allergy_info = AllergySerializer(source="allergy", read_only=True)
