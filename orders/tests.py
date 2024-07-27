@@ -76,7 +76,7 @@ class OrderTestCase(APITestCase):
                 },
             ],
         }
-        for i in range(2):
+        for i in range(5):
             serializer = OrderSerializer(data=self.order_data)
             serializer.is_valid()
             self.order = serializer.save()
@@ -90,7 +90,7 @@ class OrderTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 4)
-        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(len(response.data["results"]), 5)
 
     def test_order_post(self):
         url = reverse("order-list")
