@@ -4,27 +4,12 @@ from rest_framework.test import APITestCase
 
 from common.models import Allergy
 from menus.models import Menu, MenuDetailCategory
-from menus.serializers import MenuDetailCategorySerializer, MenuWithDetailSerializer
+from utils.test_helper import create_menu
 
 
 class MenuAPITestCase(APITestCase):
     def setUp(self) -> None:
-        menu_data = {
-            "name": "menu name",
-            "description": "descriptionnnsss",
-            "kcal": 333,
-            "image_url": "https://naver.com",
-            "price": 1000,
-            "category": "bob",
-            "menu_details": [
-                {"allergy": "메밀", "detail_category": "상세 카테고리1"},
-                {"allergy": None, "detail_category": "상세 카테고리2"},
-            ],
-        }
-
-        serializer = MenuWithDetailSerializer(data=menu_data)
-        serializer.is_valid(raise_exception=True)
-        self.menu = serializer.save()
+        self.menu = create_menu(name="test_menu1")
 
         self.valid_payload = {
             "name": "Updated Menu",
@@ -45,7 +30,7 @@ class MenuAPITestCase(APITestCase):
             "category": "bob",
             "menu_details": [
                 {
-                    "id": serializer.data["menu_details"][0]["id"],
+                    "id": 1,
                     "allergy": "복숭아",
                     "detail_category": "Updated Detail Category",
                 }
@@ -69,14 +54,15 @@ class MenuAPITestCase(APITestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data), Menu.objects.count())
+        self.assertEqual(len(res.data), 4)
+        self.assertEqual(res.data["current_page"], 1)
 
     def test_menu_detail_get(self) -> None:
         url = reverse("menu-detail", kwargs={"pk": self.menu.pk})
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data["name"], "menu name")
+        self.assertEqual(res.data["name"], "test_menu1")
 
     def test_create_menu(self) -> None:
         url = reverse("menu-list")
@@ -99,7 +85,7 @@ class MenuAPITestCase(APITestCase):
         self.assertEqual(Menu.objects.count(), 2)
         self.assertEqual(MenuDetailCategory.objects.count(), 4)
 
-        menu: Menu = Menu.objects.last()
+        menu = Menu.objects.last()
         self.assertEqual(menu.name, "테스트 메뉴")
         self.assertEqual(menu.category, Menu.Category.CHAN.value)
 
@@ -107,9 +93,7 @@ class MenuAPITestCase(APITestCase):
         self.assertEqual(allergies.count(), 21)
         self.assertEqual(allergies.first().name, "메밀")
 
-        menu_details: MenuDetailCategory = MenuDetailCategory.objects.filter(menu=menu)
+        menu_details = MenuDetailCategory.objects.filter(menu=menu)
         self.assertEqual(menu_details.count(), 2)
         self.assertEqual(menu_details.first().allergy.name, "메밀")
         self.assertIsNone(menu_details.last().allergy)
-
-        print(response.data)

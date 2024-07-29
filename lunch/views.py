@@ -3,62 +3,50 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Menu
-from .serializers import MenuWithDetailSerializer
+from .models import Lunch
+from .serializers import LunchSerializer
 
 
-class MenuList(APIView):
+class LunchList(APIView):
 
     def get(self, request: Request) -> Response:
-
         page = int(request.GET.get("page", "1"))
         size = int(request.GET.get("size", "10"))
-        category = request.GET.get("category", "bob").lower()
         offset = (page - 1) * size
 
-        total_count = Menu.objects.count()
+        total_count = Lunch.objects.count()
         total_pages = (total_count // size) + 1
 
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
 
-        if category == "":
-            return Response("category input error", status=status.HTTP_400_BAD_REQUEST)
+        lunches = Lunch.objects.order_by("-id").prefetch_related("lunch_menu__menu")[offset : offset + size]
 
-        menus = (
-            Menu.objects.filter(category=category)
-            .order_by("-id")
-            .prefetch_related("menu_details")[offset : offset + size]
-        )
-
-        serializer = MenuWithDetailSerializer(menus, many=True)
-
+        serializer = LunchSerializer(lunches, many=True)
         return Response(
             {"total_count": total_count, "total_pages": total_pages, "current_page": page, "results": serializer.data},
             status=status.HTTP_200_OK,
         )
 
-        # return Response(serializer.data, status=status.HTTP_200_OK)
-
     def post(self, request: Request) -> Response:
         # if not request.user.is_authenticated or request.user.status != "store":
         #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = MenuWithDetailSerializer(data=request.data)
+        serializer = LunchSerializer(data=request.data)
         if serializer.is_valid():
-            menu = serializer.save()
-            return Response(MenuWithDetailSerializer(menu).data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MenuDetail(APIView):
+class LunchDetail(APIView):
     def get(self, request: Request, pk: int) -> Response:
         try:
-            menu = Menu.objects.get(pk=pk)
-        except Menu.DoesNotExist:
+            lunch = Lunch.objects.get(pk=pk)
+        except Lunch.DoesNotExist:
             return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MenuWithDetailSerializer(menu)
+        serializer = LunchSerializer(lunch)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int) -> Response:
@@ -67,17 +55,17 @@ class MenuDetail(APIView):
         #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            menu = Menu.objects.get(pk=pk)
-        except Menu.DoesNotExist:
+            lunch = Lunch.objects.get(pk=pk)
+        except Lunch.DoesNotExist:
             return Response({"success": False}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MenuWithDetailSerializer(menu, data=request.data, partial=False)
+        serializer = LunchSerializer(lunch, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: Request, pk: int) -> Response:
-        menu = Menu.objects.get(pk=pk)
-        menu.delete()
+        lunch = Lunch.objects.get(pk=pk)
+        lunch.delete()
         return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
