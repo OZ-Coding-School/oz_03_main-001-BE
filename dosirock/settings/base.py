@@ -28,9 +28,17 @@ DJANGO_SYSTEM_APPS = [
     "django.contrib.sites",
 ]
 
-THIRD_PARTY_APPS = ["rest_framework", "rest_framework_simplejwt"]
 
-CUSTOM_USER_APPS = ["common.apps.CommonConfig", "oauth", "users"]
+THIRD_PARTY_APPS = ["rest_framework", "rest_framework_simplejwt", "drf_spectacular",]
+
+CUSTOM_USER_APPS = [
+    "common.apps.CommonConfig",
+    "menus.apps.MenusConfig",
+    "lunch.apps.LunchConfig",
+    "orders.apps.OrdersConfig",
+    "oauth",
+    "users"
+]
 
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + THIRD_PARTY_APPS + CUSTOM_USER_APPS
@@ -47,6 +55,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "dosirock.urls"
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+                  }
+
 
 TEMPLATES = [
     {
@@ -107,11 +123,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 SITE_ID = 1
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-}
 
 
 SIMPLE_JWT = {
