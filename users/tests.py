@@ -10,12 +10,10 @@ class UserTestCase(TestCase):
     # 이메일과 패스워드를 입력받고, 회원가입이 정상적으로 잘 이뤄졌는지 체크
 
     def test_create_user(self):  # 일반 유저 생성 테스트 함수
-        email = 'giung@gmail.com'
-        password = 'password123'
+        email = "giung@gmail.com"
+        password = "password123"
 
-        user = get_user_model().objects.create_user(
-            email=email, password=password
-        )
+        user = get_user_model().objects.create_user(email=email, password=password)
 
         # 유저가 정상적으로 잘 만들어졌는지 확인
         self.assertEqual(user.email, email)
@@ -27,13 +25,10 @@ class UserTestCase(TestCase):
         self.assertFalse(user.is_superuser)
 
     def test_create_superuser(self):  # 슈퍼 유저 생성 테스트 함수
-        email = 'giung_super@gmail.com'
-        password = 'password123'
+        email = "giung_super@gmail.com"
+        password = "password123"
 
-        super_user = get_user_model().objects.create_superuser(
-            email=email,
-            password=password
-        )
+        super_user = get_user_model().objects.create_superuser(email=email, password=password)
 
         self.assertTrue(super_user.is_superuser)
         self.assertTrue(super_user.is_staff)
