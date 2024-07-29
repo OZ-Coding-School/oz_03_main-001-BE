@@ -84,7 +84,6 @@ class OrderTestCase(APITestCase):
     def test_order_list_get(self):
         url = reverse("order-list")
 
-        # 로거 인스턴스 생성
         with self.assertNumQueries(6):
             response = self.client.get(url)
 

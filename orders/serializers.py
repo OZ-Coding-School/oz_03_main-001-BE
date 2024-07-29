@@ -38,6 +38,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "is_disposable",
             "total_price",
             "items",
+            "created_at",
         ]
 
     @transaction.atomic
