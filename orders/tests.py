@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -25,9 +23,11 @@ class OrderTestCase(APITestCase):
             "user": self.user.pk,
             "total_price": 17000,
             "status": 1,
-            "request_things": "특별 요청사항",
+            "cooking_memo": "음식 요청사항",
+            "delivery_memo": "배달 요청사항",
             "name": "김철수",
             "address": "서울시 강남구",
+            "detail_address": "강남아파트 103동 2402호",
             "contact_number": "010-1234-5678",
             "is_disposable": False,
             "items": [
@@ -112,9 +112,11 @@ class OrderTestCase(APITestCase):
             "user": self.user.pk,
             "total_price": 17000,
             "status": -1,
-            "request_things": "특별 요청사항",
+            "cooking_memo": "음식 요청사항",
+            "delivery_memo": "배달 요청사항",
             "name": "김철수",
             "address": "서울시 강남구",
+            "detail_address": "강남아파트 103동 2402호",
             "contact_number": "010-1234-5678",
             "is_disposable": False,
             "items": [

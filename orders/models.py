@@ -6,9 +6,11 @@ from common.models import CommonModel
 
 class Order(CommonModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    request_things = models.TextField(blank=True)
+    address = models.TextField(blank=True)
+    detail_address = models.TextField(blank=True)
+    cooking_memo = models.TextField(blank=True)
+    delivery_memo = models.TextField(blank=True)
     name = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=100)
     is_disposable = models.BooleanField(default=False)
     total_price = models.PositiveIntegerField(default=0)

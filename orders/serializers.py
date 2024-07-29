@@ -29,11 +29,14 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            "id",
             "user",
-            "request_things",
             "name",
             "status",
             "address",
+            "detail_address",
+            "cooking_memo",
+            "delivery_memo",
             "contact_number",
             "is_disposable",
             "total_price",
