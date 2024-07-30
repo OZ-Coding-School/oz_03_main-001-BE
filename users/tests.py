@@ -4,6 +4,7 @@ from django.urls import reverse
 from users.models import User
 from common.models import Allergy
 
+# TODO 테스트 코드 다시 확인 및 다른 앱 테스트 코드 이어서 작성
 
 class UserTests(APITestCase):
     def setUp(self):
@@ -89,10 +90,10 @@ class UserTests(APITestCase):
 
     def test_post_allergies(self):
         # Create some allergies
-        Allergy.objects.get_or_create(name="메밀")
-        Allergy.objects.get_or_create(name="밀")
-        data = {"allergies": {"메밀": True, "밀": True}}
+        Allergy.objects.get_or_create(name="대두")
+        Allergy.objects.get_or_create(name="호두")
+        data = {"allergies": {"대두": True, "호두": True}}
         self.client.force_authenticate(user=self.test_user)
         response = self.client.post(self.allergies_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(set(self.test_user.allergies.values_list("name", flat=True)), {"메밀", "밀"})
+        self.assertEqual(set(self.test_user.allergies.values_list("name", flat=True)), {"대두", "호두"})
