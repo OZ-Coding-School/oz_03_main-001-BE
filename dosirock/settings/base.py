@@ -29,7 +29,11 @@ DJANGO_SYSTEM_APPS = [
 ]
 
 
-THIRD_PARTY_APPS = ["rest_framework", "rest_framework_simplejwt", "drf_spectacular",]
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "drf_spectacular",
+]
 
 CUSTOM_USER_APPS = [
     "common.apps.CommonConfig",
@@ -37,7 +41,7 @@ CUSTOM_USER_APPS = [
     "lunch.apps.LunchConfig",
     "orders.apps.OrdersConfig",
     "oauth",
-    "users"
+    "users",
 ]
 
 
@@ -59,9 +63,12 @@ ROOT_URLCONF = "dosirock.urls"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-                  }
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated", "rest_framework.permissions.AllowAny"),
+}
 
 
 TEMPLATES = [

@@ -2,6 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from users.models import User
+from common.models import Allergy
 from rest_framework import serializers
 
 
@@ -34,3 +35,15 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data["password"])
         user.save()
         return user
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    allergies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "created_at", "updated_at", "allergies"]
+        extra_kwargs = {"password": {"write_only": True}}
+
+    def get_allergies(self, obj):
+        return {allergy.name: True for allergy in obj.allergies.all()}

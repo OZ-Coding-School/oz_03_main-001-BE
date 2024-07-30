@@ -1,11 +1,10 @@
-from django.contrib.auth.models import User
+from users.models import User
 from django.db import models
 
 from common.models import CommonModel
 
 
 class Lunch(CommonModel):
-    # TODO: store 모델 생성하면 변경 필요
     store = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, default="도시락")
     description = models.TextField(null=True, blank=True)

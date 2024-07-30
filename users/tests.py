@@ -1,34 +1,98 @@
-from django.test import TestCase
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.urls import reverse
+from users.models import User
+from common.models import Allergy
 
-from django.test import TestCase
-from django.contrib.auth import get_user_model  # AbstracBaseUser 상속을 받는다
 
+class UserTests(APITestCase):
+    def setUp(self):
+        self.signup_url = reverse("signup")
+        self.login_url = reverse("login")
+        self.user_info_url = reverse("user_info")
+        self.user_update_url = lambda pk: reverse("user", kwargs={"pk": pk})
+        self.logout_url = reverse("logout")
+        self.allergies_url = reverse("allergies")
 
-# TDD: Test Driven Development (테스트 주도 개발) => 채용공고 => 우대사항: TDD
-class UserTestCase(TestCase):
-    # 회원가입을 가정하고 => 회원가입 함수 테스트 코드를 작성하려고 합니다.
-    # 이메일과 패스워드를 입력받고, 회원가입이 정상적으로 잘 이뤄졌는지 체크
+        # Create a test user
+        self.test_user = User.objects.create_user(
+            username="testuser", email="test@example.com", password="testpassword"
+        )
 
-    def test_create_user(self):  # 일반 유저 생성 테스트 함수
-        email = "giung@gmail.com"
-        password = "password123"
+        Allergy.objects.all().delete()
 
-        user = get_user_model().objects.create_user(email=email, password=password)
+    def test_signup(self):
+        data = {"username": "newuser", "email": "newuser@example.com", "password": "!rldnd12"}
+        response = self.client.post(self.signup_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertTrue("access_token" in response.cookies)
+        self.assertTrue("refresh_token" in response.cookies)
 
-        # 유저가 정상적으로 잘 만들어졌는지 확인
-        self.assertEqual(user.email, email)
+    def test_login(self):
+        data = {"username": "testuser", "password": "testpassword"}
+        response = self.client.post(self.login_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # self.assertEqual(user.check_password(password), True)
-        self.assertTrue(user.check_password(password))
+    def test_user_info(self):
+        response = self.client.get(self.user_info_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), User.objects.count())
 
-        # self.assertEqual(user.is_superuser, False)
-        self.assertFalse(user.is_superuser)
+    def test_user_update(self):
+        data = {"username": "updateduser", "email": "updateduser@example.com", "password": "!rldnd12"}
+        self.client.force_authenticate(user=self.test_user)
+        response = self.client.put(self.user_update_url(self.test_user.pk), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["username"], "updateduser")
+        self.assertEqual(response.data["email"], "updateduser@example.com")
 
-    def test_create_superuser(self):  # 슈퍼 유저 생성 테스트 함수
-        email = "giung_super@gmail.com"
-        password = "password123"
+    def test_user_delete(self):
+        self.client.force_authenticate(user=self.test_user)
+        response = self.client.delete(self.user_update_url(self.test_user.pk), format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(User.objects.filter(pk=self.test_user.pk).exists())
 
-        super_user = get_user_model().objects.create_superuser(email=email, password=password)
+    def test_logout(self):
+        self.client.force_authenticate(user=self.test_user)
+        response = self.client.post(self.logout_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertTrue(super_user.is_superuser)
-        self.assertTrue(super_user.is_staff)
+    # def test_get_allergies(self):
+    #     # Create some allergies
+    #     allergy1 = Allergy.objects.create(name="메밀")
+    #     allergy2 = Allergy.objects.create(name="밀")
+    #     self.test_user.allergies.set([allergy1, allergy2])
+    #     self.client.force_authenticate(user=self.test_user)
+    #     response = self.client.get(self.allergies_url, format="json")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(response.data["allergies"], {"메밀": True, "밀": True})
+
+    def test_get_allergies(self):
+        # Create some allergies
+        allergy1 = Allergy.objects.create(name="메밀")
+        allergy2 = Allergy.objects.create(name="밀")
+        self.test_user.allergies.set([allergy1, allergy2])
+        self.client.force_authenticate(user=self.test_user)
+        response = self.client.get(self.allergies_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["allergies"], {"메밀": True, "밀": True})
+
+    # def test_post_allergies(self):
+    #     # Create some allergies
+    #     Allergy.objects.create(name="메밀")
+    #     Allergy.objects.create(name="밀")
+    #     data = {"allergies": {"메밀": True, "밀": True}}
+    #     self.client.force_authenticate(user=self.test_user)
+    #     response = self.client.post(self.allergies_url, data, format="json")
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(set(self.test_user.allergies.values_list("name", flat=True)), {"메밀", "밀"})
+
+    def test_post_allergies(self):
+        # Create some allergies
+        Allergy.objects.get_or_create(name="메밀")
+        Allergy.objects.get_or_create(name="밀")
+        data = {"allergies": {"메밀": True, "밀": True}}
+        self.client.force_authenticate(user=self.test_user)
+        response = self.client.post(self.allergies_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(set(self.test_user.allergies.values_list("name", flat=True)), {"메밀", "밀"})

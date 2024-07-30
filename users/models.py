@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     AbstractUser,
 )
-from common.models import CommonModel
+from common.models import CommonModel, Allergy
 
 
 class UserManager(BaseUserManager):
@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin, CommonModel):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    allergies = models.ManyToManyField(Allergy, blank=True, related_name="users")
 
     USERNAME_FIELD = "username"  # USERNAME_FIELD로 정의가 되어있는 필드는 unique=True가 필요
     EMAIL_FIELD = "email"

@@ -14,7 +14,6 @@ class OrderList(APIView):
         size = int(request.GET.get("size", "10"))
         offset = (page - 1) * size
 
-        # TODO: USER 추가 시 filter 적용
         # user_id = request.user.id
 
         total_count = Order.objects.count()
@@ -42,7 +41,6 @@ class OrderList(APIView):
         serializer = OrderSerializer(data=request.data)
 
         if serializer.is_valid():
-            # TODO: user 추가
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
