@@ -2,13 +2,6 @@
 
 from django.db import migrations, models
 
-from common.models import Allergy
-
-
-def create_initial_allergies(apps, schema_editor):
-    allergies = [Allergy(name=allergy.value) for allergy in Allergy.AllergyType]
-    Allergy.objects.bulk_create(allergies)
-
 
 class Migration(migrations.Migration):
 
@@ -47,7 +40,7 @@ class Migration(migrations.Migration):
                             ("SQUI", "오징어"),
                             ("SULF", "아황산류"),
                         ],
-                        max_length=4,
+                        max_length=20,
                         unique=True,
                         verbose_name="알레르기 유형",
                     ),
@@ -58,5 +51,4 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "알레르기 목록",
             },
         ),
-        migrations.RunPython(create_initial_allergies),
     ]

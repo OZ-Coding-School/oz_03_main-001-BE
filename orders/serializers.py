@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import serializers
 
@@ -23,8 +24,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ["lunch", "quantity"]
 
 
+class OrderUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ["id"]
+
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    user = OrderUserSerializer(read_only=True)
 
     class Meta:
         model = Order

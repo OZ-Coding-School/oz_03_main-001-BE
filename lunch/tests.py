@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase
 
 from lunch.models import Lunch, LunchMenu
 from menus.models import Menu
+from menus.serializers import MenuWithDetailSerializer
 from utils.test_helper import create_menu
 
 
@@ -15,6 +16,87 @@ class LunchAPITestCase(APITestCase):
 
         menu1 = create_menu(name="test_menu1")
         menu2 = create_menu(name="test_menu2")
+
+        menu_data = {
+            "name": "돼지고기 김치 볶음",
+            "description": "descriptionnnsss",
+            "kcal": 333,
+            "image_url": "https://naver.com",
+            "price": 1000,
+            "category": "chan",
+            "menu_details": [
+                {"allergy": "대두", "detail_category": "볶음"},
+                {"allergy": "돼지고기", "detail_category": "돼지고기"},
+            ],
+        }
+        menu_data3 = {
+            "name": "소고기 김치 볶음",
+            "description": "descriptionnnsss",
+            "kcal": 600,
+            "image_url": "https://naver.com",
+            "price": 1000,
+            "category": "chan",
+            "menu_details": [
+                {"allergy": "대두", "detail_category": "볶음"},
+                {"allergy": "돼지고기", "detail_category": "돼지고기"},
+            ],
+        }
+        menu_data4 = {
+            "name": "고등어 김치 볶음",
+            "description": "descriptionnnsss",
+            "kcal": 400,
+            "image_url": "https://naver.com",
+            "price": 1000,
+            "category": "chan",
+            "menu_details": [
+                {"allergy": "대두", "detail_category": "볶음"},
+                {"allergy": "돼지고기", "detail_category": "돼지고기"},
+            ],
+        }
+
+        menu_data2 = {
+            "name": "된장찌개",
+            "description": "descriptionnnsss",
+            "kcal": 500,
+            "image_url": "https://naver.com",
+            "price": 1000,
+            "category": "guk",
+            "menu_details": [
+                {"allergy": "대두", "detail_category": "볶음"},
+            ],
+        }
+
+        menu_data5 = {
+            "name": "김치찌개",
+            "description": "descriptionnnsss",
+            "kcal": 676,
+            "image_url": "https://naver.com",
+            "price": 1000,
+            "category": "guk",
+            "menu_details": [
+                {"allergy": "대두", "detail_category": "볶음"},
+            ],
+        }
+
+        serializer = MenuWithDetailSerializer(data=menu_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        serializer = MenuWithDetailSerializer(data=menu_data2)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        serializer = MenuWithDetailSerializer(data=menu_data3)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        serializer = MenuWithDetailSerializer(data=menu_data4)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        serializer = MenuWithDetailSerializer(data=menu_data5)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         for i in range(1, 11):
             lunch = Lunch.objects.create(
@@ -92,3 +174,10 @@ class LunchAPITestCase(APITestCase):
 
         with self.assertRaises(Lunch.DoesNotExist):
             Lunch.objects.get(pk=1)
+
+    def test_random_lunch_get(self):
+        url = reverse("lunch-random")
+        res = self.client.get(url)
+        print("test random start")
+        print(res.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
