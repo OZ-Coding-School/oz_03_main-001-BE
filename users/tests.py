@@ -6,6 +6,7 @@ from common.models import Allergy
 
 # TODO 테스트 코드 다시 확인 및 다른 앱 테스트 코드 이어서 작성
 
+
 class UserTests(APITestCase):
     def setUp(self):
         self.signup_url = reverse("signup")

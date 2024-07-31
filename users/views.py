@@ -46,6 +46,7 @@ class UserInfoView(APIView):
 
 
 class UserUpdateView(APIView):
+    # TODO 인가 코드쪽 구현
     permission_classes = [AllowAny]
 
     def get(self, request, pk, *args, **kwargs):
