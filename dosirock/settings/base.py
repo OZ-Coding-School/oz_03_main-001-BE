@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -13,8 +14,7 @@ SECRET_KEY = "django-insecure-pfc1q$4=q=%%@f5)k@32h2c#aw#783x#b#ctjsy-m93=e=6)6!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
-
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(" ")
 
 # Application definition
 DJANGO_SYSTEM_APPS = [
@@ -33,6 +33,7 @@ CUSTOM_USER_APPS = [
     "menus.apps.MenusConfig",
     "lunch.apps.LunchConfig",
     "orders.apps.OrdersConfig",
+    "corsheaders",
 ]
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS
@@ -40,6 +41,7 @@ INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -49,9 +51,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "dosirock.urls"
 
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+}
 
-REST_FRAMEWORK = {"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"}
-
+CORS_ORIGIN_WHITELIST = os.getenv("CORS_ORIGIN_WHITELIST").split(" ")
 
 TEMPLATES = [
     {
