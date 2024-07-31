@@ -32,7 +32,13 @@ class SignupView(APIView):
             access_token = str(refresh.access_token)  # type: ignore
             refresh_token = str(refresh)
 
-            response = redirect(reverse("/"))  # or any URL name you want
+            response_data = {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "user": serializer.data,
+            }
+
+            response = Response(response_data, status=status.HTTP_201_CREATED)
             response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
             response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
             return response
