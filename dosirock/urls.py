@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse
-from . import views
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+from . import views
 
 
 def hello_test(request: HttpRequest) -> HttpResponse:

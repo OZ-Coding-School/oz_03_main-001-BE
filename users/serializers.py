@@ -1,9 +1,9 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-
-from users.models import User
-from common.models import Allergy
 from rest_framework import serializers
+
+from common.models import Allergy
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):

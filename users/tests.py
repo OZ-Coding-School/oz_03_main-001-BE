@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
-from rest_framework import status
 from django.urls import reverse
-from users.models import User
+from rest_framework import status
+from rest_framework.test import APITestCase
+
 from common.models import Allergy
+from users.models import User
 
 # TODO 테스트 코드 다시 확인 및 다른 앱 테스트 코드 이어서 작성
 

@@ -1,14 +1,14 @@
 import json
 import os
 
+import requests
 from django.conf import settings
+from django.contrib.auth import logout
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth import logout
 from rest_framework import status
-import requests
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
