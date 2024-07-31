@@ -65,6 +65,10 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE_CONTENT }}" > .env
+
       - name: Run Mypy
         run: |
           poetry run mypy .
