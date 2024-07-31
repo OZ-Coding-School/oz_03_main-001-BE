@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # TODO user 수정
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -11,16 +11,16 @@ from .serializers import OrderSerializer
 
 class OrderTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user("test", "test@naver.com", "1234")
+        self.user = User.objects.create_user("test@naver.com", "1234")
         self.client.login(email="test@naver.com", password="1234")
-
+        # TODO: token api merge 후 수정
+        self.client.force_authenticate(user=self.user)
         create_menu(name="menu1")
         create_menu(name="menu2")
         create_menu(name="menu3")
         create_menu(name="menu4")
 
         self.order_data = {
-            "user": self.user.pk,
             "total_price": 17000,
             "status": 1,
             "cooking_memo": "음식 요청사항",
@@ -79,12 +79,12 @@ class OrderTestCase(APITestCase):
         for i in range(5):
             serializer = OrderSerializer(data=self.order_data)
             serializer.is_valid()
-            self.order = serializer.save()
+            self.order = serializer.save(user=self.user)
 
     def test_order_list_get(self):
         url = reverse("order-list")
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -103,13 +103,11 @@ class OrderTestCase(APITestCase):
     def test_order_detail_get(self):
         url = reverse("order-detail", kwargs={"pk": self.order.pk})
         res = self.client.get(url)
-
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["items"][1]["lunch"]["id"], 10)
 
     def test_order_update(self):
         order_data = {
-            "user": self.user.pk,
             "total_price": 17000,
             "status": -1,
             "cooking_memo": "음식 요청사항",
@@ -168,6 +166,7 @@ class OrderTestCase(APITestCase):
 
         res = self.client.put(url, data=order_data, format="json")
 
+        self.assertEqual(res.data["user"]["id"], 1)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["status"], -1)
         self.assertEqual(res.data["total_price"], 17000)

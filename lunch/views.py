@@ -1,9 +1,13 @@
+import random
+
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Lunch
+from menus.models import Menu
+
+from .models import Lunch, LunchMenu
 from .serializers import LunchSerializer
 
 
@@ -69,3 +73,40 @@ class LunchDetail(APIView):
         lunch = Lunch.objects.get(pk=pk)
         lunch.delete()
         return Response({"success": True}, status=status.HTTP_204_NO_CONTENT)
+
+
+class LunchRandomList(APIView):
+    def get(self, request: Request) -> Response:
+        all_menus = Menu.objects.all()
+        bob_menus = [menu for menu in all_menus if menu.category == "bob"]
+        guk_menus = [menu for menu in all_menus if menu.category == "guk"]
+        chan_menus = [menu for menu in all_menus if menu.category == "chan"]
+
+        random_lunch: list[Lunch] = []
+
+        while len(random_lunch) != 2:
+            selected_menus = random.sample(bob_menus, 1) + random.sample(guk_menus, 1) + random.sample(chan_menus, 3)
+
+            lunch = Lunch.objects.create(
+                name="랜덤 도시락",
+                description="랜덤 도시락",
+                image_url="https://img.freepik.com/free-vector/hand-drawn-umeboshi-bento-illustration_23-2148845622.jpg",
+            )
+
+            for menu in selected_menus:
+                LunchMenu.objects.create(
+                    lunch=lunch,
+                    menu=menu,
+                    quantity=1,
+                )
+
+            lunch.update_total_price()
+            lunch.update_total_kcal()
+            random_lunch.append(lunch)
+
+        serializer = LunchSerializer(random_lunch, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
