@@ -29,6 +29,7 @@ def kakao_login(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods(["GET"])
 def kakao_callback(request: HttpRequest) -> HttpResponse:
+    #  TODO 리프레쉬 검증 로직
     code = request.GET.get("code")
 
     token_data: Dict[str, Optional[str]] = {
