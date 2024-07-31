@@ -36,12 +36,12 @@ class MenuList(APIView):
         if search:
             menus = menus.filter(name__icontains=search)
 
+        total_count = menus.count()
+        total_pages = (total_count - 1) // size + 1
+
         menu_details_prefetch = Prefetch("menu_details", queryset=MenuDetailCategory.objects.select_related("allergy"))
 
         menus = menus.order_by("-id").prefetch_related(menu_details_prefetch)[offset : offset + size]
-
-        total_count = len(menus)
-        total_pages = (total_count - 1) // size + 1
 
         serializer = MenuWithDetailSerializer(menus, many=True)
 

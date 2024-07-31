@@ -1,6 +1,8 @@
+
 import json
 import os
 from datetime import timedelta
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -15,7 +17,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(" ")
+
 
 # Application definition
 DJANGO_SYSTEM_APPS = [
@@ -42,6 +45,7 @@ CUSTOM_USER_APPS = [
     "orders.apps.OrdersConfig",
     "oauth",
     "users",
+    "corsheaders",
 ]
 
 
@@ -51,6 +55,7 @@ INSTALLED_APPS = DJANGO_SYSTEM_APPS + THIRD_PARTY_APPS + CUSTOM_USER_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -60,12 +65,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "dosirock.urls"
 
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+}
+
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated", "rest_framework.permissions.AllowAny"),
 }
+
+
+CORS_ORIGIN_WHITELIST = os.getenv("CORS_ORIGIN_WHITELIST").split(" ")
 
 
 TEMPLATES = [

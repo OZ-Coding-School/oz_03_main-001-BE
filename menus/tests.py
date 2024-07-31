@@ -77,7 +77,7 @@ class MenuAPITestCase(APITestCase):
         base_url = reverse("menu-list")
         url = f"{base_url}?category=guk&allergy=조개류&search=찌개"
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -87,7 +87,7 @@ class MenuAPITestCase(APITestCase):
         base_url = reverse("menu-list")
         url = f"{base_url}?category=chan&search=돼지"
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -108,7 +108,7 @@ class MenuAPITestCase(APITestCase):
     def test_menu_list_get(self) -> None:
         url = reverse("menu-list")
         res = self.client.get(url)
-        print(res.data)
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 4)
         self.assertEqual(res.data["current_page"], 1)
