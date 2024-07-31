@@ -18,6 +18,7 @@ requests = "^2.32.3"
 djangorestframework-simplejwt = "^5.3.1"
 isort = "^5.13.2"
 mypy = "^1.11.1"
+pyjwt = "^2.8.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

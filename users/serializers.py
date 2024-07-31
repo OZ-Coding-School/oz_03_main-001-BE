@@ -47,3 +47,18 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     def get_allergies(self, obj):
         return {allergy.name: True for allergy in obj.allergies.all()}
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    username = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ["username", "email"]
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get("email", instance.email)
+        instance.username = validated_data.get("username", instance.username)
+        instance.save()
+        return instance

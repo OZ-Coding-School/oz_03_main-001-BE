@@ -1,12 +1,13 @@
+from typing import Any, Optional, TypeVar
+
 from django.contrib.auth.models import AbstractBaseUser  # User를 상속 받도록 한다
 from django.contrib.auth.models import PermissionsMixin  # super user, 일반 user를 구분하기 위해
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from typing import TypeVar, Optional, Any
 
 from common.models import Allergy, CommonModel
 
-T = TypeVar('T', bound='User')
+T = TypeVar("T", bound="User")
 
 
 class UserManager(BaseUserManager[T]):

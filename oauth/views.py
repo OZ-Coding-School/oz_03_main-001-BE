@@ -1,10 +1,12 @@
 import json
 import os
+from typing import Dict, Optional
 
 import requests
 from django.conf import settings
 from django.contrib.auth import logout
-from django.http import HttpResponse, JsonResponse
+from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
@@ -15,7 +17,7 @@ from users.models import User
 
 
 @require_http_methods(["GET"])
-def kakao_login(request):
+def kakao_login(request: HttpRequest) -> HttpResponse:
     login_url = os.environ.get("KAKAO_LOGIN_URL")
     client_id = os.environ.get("KAKAO_CLIENT_ID")
     redirect_uri = os.environ.get("KAKAO_REDIRECT_URI")
@@ -26,9 +28,10 @@ def kakao_login(request):
 
 
 @require_http_methods(["GET"])
-def kakao_callback(request):
+def kakao_callback(request: HttpRequest) -> HttpResponse:
     code = request.GET.get("code")
-    token_data = {
+
+    token_data: Dict[str, Optional[str]] = {
         "grant_type": "authorization_code",
         "client_id": os.environ.get("KAKAO_CLIENT_ID"),
         "redirect_uri": os.environ.get("KAKAO_REDIRECT_URI"),
@@ -36,24 +39,34 @@ def kakao_callback(request):
         "client_secret": os.environ.get("KAKAO_CLIENT_SECRET"),
     }
 
-    token_headers = {
+    token_headers: Dict[str, str] = {
         "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
     }
 
-    token_response = requests.post(
-        os.environ.get("KAKAO_TOKEN_URL"), headers=token_headers, data=token_data, timeout=30
-    )
+    kakao_token_url = os.environ.get("KAKAO_TOKEN_URL")
+
+    if kakao_token_url is None:
+        raise ValueError("KAKAO_TOKEN_URL 환경 변수가 설정되어 있지 않습니다")
+
+    token_response = requests.post(kakao_token_url, headers=token_headers, data=token_data, timeout=30)
 
     if token_response.status_code != 200:
+        response_content = token_response.content.decode("utf-8")
+
         return HttpResponse(
-            f"카카오 토큰 받기 실패 💀 {token_response.content}",
+            f"카카오 토큰 받기 실패 💀 {response_content}",
             status=500,
         )
 
     access_token = token_response.json()["access_token"]
 
+    kakao_profile_url = os.environ.get("KAKAO_PROFILE_URL")
+
+    if kakao_profile_url is None:
+        raise ValueError("KAKAO_PROFILE_URL 환경 변수가 설정되어 있지 않습니다")
+
     profile_response = requests.get(
-        os.environ.get("KAKAO_PROFILE_URL"),
+        kakao_profile_url,
         headers={
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
@@ -81,19 +94,17 @@ def kakao_callback(request):
     if created:
 
         user.set_unusable_password()
-        # 비밀번호를 사용한 로그인을 안되게 한다.
         user.save()
 
     print(user)
 
     # Generate tokens using SimpleJWT
     refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
+    access_token = str(refresh.access_token)  # type: ignore
     refresh_token = str(refresh)
 
     print(f"access_token: {access_token}\nrefresh_token: {refresh_token}")
 
-    # response = JsonResponse(profile_info, status=200)
     response = redirect(reverse("/"))
     response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
     response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
@@ -102,7 +113,7 @@ def kakao_callback(request):
 
 
 @require_http_methods(["GET"])
-def kakao_logout(request):
+def kakao_logout(request: HttpRequest) -> HttpResponse:
     client_id = os.environ.get("KAKAO_CLIENT_ID")
     redirect_logout_url = os.environ.get("KAKAO_REDIRECT_KAKAO_LOGOUT_URI")
     logout_url = os.environ.get("KAKAO_LOGOUT_URL")
