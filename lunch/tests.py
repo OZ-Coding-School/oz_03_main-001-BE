@@ -178,6 +178,4 @@ class LunchAPITestCase(APITestCase):
     def test_random_lunch_get(self):
         url = reverse("lunch-random")
         res = self.client.get(url)
-        print("test random start")
-        print(res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)

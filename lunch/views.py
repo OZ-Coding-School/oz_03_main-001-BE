@@ -84,7 +84,7 @@ class LunchRandomList(APIView):
 
         random_lunch: list[Lunch] = []
 
-        while len(random_lunch) != 2:
+        while len(random_lunch) != 10:
             selected_menus = random.sample(bob_menus, 1) + random.sample(guk_menus, 1) + random.sample(chan_menus, 3)
 
             lunch = Lunch.objects.create(
