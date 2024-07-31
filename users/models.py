@@ -2,13 +2,16 @@ from django.contrib.auth.models import AbstractBaseUser  # User를 상속 받도
 from django.contrib.auth.models import PermissionsMixin  # super user, 일반 user를 구분하기 위해
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from typing import TypeVar, Optional, Any
 
 from common.models import Allergy, CommonModel
 
+T = TypeVar('T', bound='User')
 
-class UserManager(BaseUserManager):
+
+class UserManager(BaseUserManager[T]):
     # 일반 유저 생성 함수
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, username: str, email: str, password: Optional[str] = None, **extra_fields: Any) -> T:
 
         if not email:
             raise ValueError("Please enter your email address")
@@ -20,7 +23,7 @@ class UserManager(BaseUserManager):
         return user
 
     # 슈퍼 유저 생성 함수
-    def create_superuser(self, username, email, password=None, **extra_fields):
+    def create_superuser(self, username: str, email: str, password: Optional[str] = None, **extra_fields: Any) -> T:
 
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
@@ -47,5 +50,5 @@ class User(AbstractBaseUser, PermissionsMixin, CommonModel):
 
     objects = UserManager()  # 유저를 생성 및 관리 (유저를 구분해서 관리하기 위해 - 관리자계정, 일반계정)
 
-    def __str__(self):  # 핵심 데이터를 볼 수 있게 설정
+    def __str__(self) -> str:  # 핵심 데이터를 볼 수 있게 설정
         return f"email: {self.email}, username: {self.username}"

@@ -104,7 +104,7 @@ def kakao_callback(request):
 @require_http_methods(["GET"])
 def kakao_logout(request):
     client_id = os.environ.get("KAKAO_CLIENT_ID")
-    redirect_logout_url = os.environ.get("KAKAO_REDIRECT_KAKAO_LOGOUT_URL_URI")
+    redirect_logout_url = os.environ.get("KAKAO_REDIRECT_KAKAO_LOGOUT_URI")
     logout_url = os.environ.get("KAKAO_LOGOUT_URL")
 
     if not client_id or not redirect_logout_url or not logout_url:

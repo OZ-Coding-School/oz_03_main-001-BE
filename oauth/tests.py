@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from django.test import Client, TestCase
 from django.urls import reverse
+from dotenv import load_dotenv
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
@@ -11,20 +12,22 @@ from users.models import User
 
 class KakaoAuthTests(TestCase):
     def setUp(self):
+        load_dotenv()
+
         self.client = Client()
         self.kakao_login_url = reverse("kakao_login")
         self.kakao_callback_url = reverse("kakao_callback")
         self.kakao_logout_url = reverse("kakao_logout")
 
         # 환경 변수 설정
-        self.kakao_login_url_env = "https://kauth.kakao.com/oauth/authorize"
-        self.kakao_token_url_env = "https://kauth.kakao.com/oauth/token"
-        self.kakao_profile_url_env = "https://kapi.kakao.com/v2/user/me"
-        self.kakao_client_id_env = "afdb05020c99725b2e9d3abdacc04cb2"
-        self.kakao_redirect_uri_env = "http://127.0.0.1:8000/v1/users/kakao/callback/"
-        self.kakao_client_secret_env = "lsklWvQBeUu3osttxNlgZlmkuXifek19"
-        self.kakao_logout_url_env = "https://kauth.kakao.com/oauth/logout"
-        self.kakao_redirect_logout_uri_env = "http://127.0.0.1:8000/api/v1/users/kakao/logout/"
+        self.kakao_login_url_env = os.getenv("KAKAO_LOGIN_URL")
+        self.kakao_token_url_env = os.getenv("KAKAO_TOKEN_URL")
+        self.kakao_profile_url_env = os.getenv("KAKAO_PROFILE_URL")
+        self.kakao_client_id_env = os.getenv("KAKAO_CLIENT_ID")
+        self.kakao_redirect_uri_env = os.getenv("KAKAO_REDIRECT_URI")
+        self.kakao_client_secret_env = os.getenv("KAKAO_SECRET")
+        self.kakao_logout_url_env = os.getenv("KAKAO_LOGOUT_URL")
+        self.kakao_redirect_logout_uri_env = os.getenv("KAKAO_REDIRECT_KAKAO_LOGOUT_URI")
 
         # 환경 변수 모킹
         patch.dict(

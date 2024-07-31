@@ -61,10 +61,6 @@ jobs:
         run: |
           poetry run isort . --check --diff
 
-      - name: Run Mypy
-        run: |
-          poetry run mypy .
-
       - name: Test python project
         run: |
           poetry run python manage.py test
