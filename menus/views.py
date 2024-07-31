@@ -1,9 +1,10 @@
+from django.db.models import Count, Prefetch, Q
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Menu
+from .models import Menu, MenuDetailCategory
 from .serializers import MenuWithDetailSerializer
 
 
@@ -14,10 +15,10 @@ class MenuList(APIView):
         page = int(request.GET.get("page", "1"))
         size = int(request.GET.get("size", "10"))
         category = request.GET.get("category", "bob").lower()
+        allergies = request.GET.get("allergy", "").lower().split(",")
+        allergies = [allergy.strip() for allergy in allergies if allergy.strip()]
+        search = request.GET.get("search", "").lower()
         offset = (page - 1) * size
-
-        total_count = Menu.objects.count()
-        total_pages = (total_count // size) + 1
 
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
@@ -25,11 +26,22 @@ class MenuList(APIView):
         if category == "":
             return Response("category input error", status=status.HTTP_400_BAD_REQUEST)
 
-        menus = (
-            Menu.objects.filter(category=category)
-            .order_by("-id")
-            .prefetch_related("menu_details")[offset : offset + size]
-        )
+        menus = Menu.objects.filter(category=category)
+
+        if allergies:
+            menus = menus.annotate(
+                allergy_count=Count("menu_details__allergy", filter=Q(menu_details__allergy__name__in=allergies))
+            ).filter(allergy_count=0)
+
+        if search:
+            menus = menus.filter(name__icontains=search)
+
+        menu_details_prefetch = Prefetch("menu_details", queryset=MenuDetailCategory.objects.select_related("allergy"))
+
+        menus = menus.order_by("-id").prefetch_related(menu_details_prefetch)[offset : offset + size]
+
+        total_count = len(menus)
+        total_pages = (total_count - 1) // size + 1
 
         serializer = MenuWithDetailSerializer(menus, many=True)
 
@@ -38,16 +50,14 @@ class MenuList(APIView):
             status=status.HTTP_200_OK,
         )
 
-        # return Response(serializer.data, status=status.HTTP_200_OK)
-
     def post(self, request: Request) -> Response:
         # if not request.user.is_authenticated or request.user.status != "store":
         #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = MenuWithDetailSerializer(data=request.data)
+        serializer = MenuWithDetailSerializer(data=request.data, many=True)
         if serializer.is_valid():
             menu = serializer.save()
-            return Response(MenuWithDetailSerializer(menu).data, status=status.HTTP_201_CREATED)
+            return Response(MenuWithDetailSerializer(menu, many=True).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
