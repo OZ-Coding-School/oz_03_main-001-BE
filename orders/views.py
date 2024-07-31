@@ -16,9 +16,7 @@ class OrderList(APIView):
         size = int(request.GET.get("size", "10"))
         offset = (page - 1) * size
 
-
         user_id = request.user.id
-
 
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
