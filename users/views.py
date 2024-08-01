@@ -16,7 +16,6 @@ from .serializers import UserSerializer, UserUpdateSerializer
 
 
 class SignupView(APIView):
-    permission_classes = [AllowAny]
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseRedirect | Response:
         serializer = UserSerializer(data=request.data)
