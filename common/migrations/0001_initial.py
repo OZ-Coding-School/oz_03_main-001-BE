@@ -2,13 +2,6 @@
 
 from django.db import migrations, models
 
-from common.models import Allergy
-
-
-def create_initial_allergies(apps, schema_editor):
-    allergies = [Allergy(name=allergy.value) for allergy in Allergy.AllergyType]
-    Allergy.objects.bulk_create(allergies)
-
 
 class Migration(migrations.Migration):
 
