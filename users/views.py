@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from rest_framework import status
-from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.exceptions import APIException, ParseError, ValidationError
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -18,26 +18,42 @@ from .serializers import UserSerializer, UserUpdateSerializer
 class SignupView(APIView):
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseRedirect | Response:
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        try:
+            print("유저 생성 인풋 로그: ", request.data)
+            serializer = UserSerializer(data=request.data)
 
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)  # type: ignore
-            refresh_token = str(refresh)
+            if serializer.is_valid():
+                user = serializer.save()
 
-            response_data = {
-                "access_token": access_token,
-                "refresh_token": refresh_token,
-                "user": serializer.data,
-            }
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)  # type: ignore
+                refresh_token = str(refresh)
 
-            response = Response(response_data, status=status.HTTP_201_CREATED)
-            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-            response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
-            return response
+                response_data = {
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "user": serializer.data,
+                }
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                response = Response(response_data, status=status.HTTP_201_CREATED)
+                response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
+                response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+                return response
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except APIException as e:
+            return Response({"error_code": e.status_code, "error_message": str(e)}, status=e.status_code)
+
+        except Exception as e:
+            return Response(
+                {
+                    "error_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "error_message": "An unexpected error occurred.",
+                    "details": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class UserUpdateView(APIView):
