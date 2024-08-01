@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from rest_framework import status
-from rest_framework.exceptions import APIException, ParseError, ValidationError
+from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -19,7 +20,6 @@ class SignupView(APIView):
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseRedirect | Response:
         try:
-            print("유저 생성 인풋 로그: ", request.data)
             serializer = UserSerializer(data=request.data)
 
             if serializer.is_valid():
@@ -42,18 +42,16 @@ class SignupView(APIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        except APIException as e:
-            return Response({"error_code": e.status_code, "error_message": str(e)}, status=e.status_code)
+        except IntegrityError as e:
+            error_message = "데이터베이스 무결성 오류가 발생했습니다."
+            if "password" in str(e).lower():
+                error_message = "비밀번호가 비슷합니다. 다른 비밀번호를 사용해주세요."
+            elif "username" in str(e).lower():
+                error_message = "이미 사용 중인 아이디입니다. 다른 아이디를 사용해주세요."
+            elif "email" in str(e).lower():
+                error_message = "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요."
 
-        except Exception as e:
-            return Response(
-                {
-                    "error_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    "error_message": "An unexpected error occurred.",
-                    "details": str(e),
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response({"error_message": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserUpdateView(APIView):
