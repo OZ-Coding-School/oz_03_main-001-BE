@@ -51,8 +51,8 @@ class MenuList(APIView):
         )
 
     def post(self, request: Request) -> Response:
-        # if not request.user.is_authenticated or request.user.status != "store":
-        #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
+        if not request.user.is_authenticated or request.user.get_status_display() != "store":
+            return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = MenuWithDetailSerializer(data=request.data, many=True)
         if serializer.is_valid():

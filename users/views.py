@@ -1,10 +1,5 @@
-import os
-
-import jwt
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import ParseError, ValidationError
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
@@ -17,7 +12,7 @@ from typing_extensions import Any
 from common.models import Allergy
 from users.models import User
 
-from .serializers import UserInfoSerializer, UserSerializer, UserUpdateSerializer
+from .serializers import UserSerializer, UserUpdateSerializer
 
 
 class SignupView(APIView):
@@ -43,7 +38,6 @@ class SignupView(APIView):
             response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
             return response
 
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -62,7 +56,6 @@ class UserUpdateView(APIView):
             serializer.save()
             return Response(serializer.data)
 
-        print(serializer.errors)
         return Response(serializer.errors, status=400)
 
     def delete(self, request: Request) -> Response:
@@ -83,14 +76,23 @@ class LoginView(APIView):
 
         user = authenticate(username=username, password=password)
         assert user is not None
-        print(user)
+
         refresh = RefreshToken.for_user(user)
-        access = str(refresh.access_token)  # type: ignore
+        access_token = str(refresh.access_token)  # type: ignore
         refresh_token = str(refresh)
 
         if user:
             login(request, user)
-            return Response({"access_token": access, "refresh_token": refresh_token})
+
+            response_data = {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+            }
+
+            response = Response(response_data, status=status.HTTP_200_OK)
+            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+            return response
 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -100,7 +102,6 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
-        print("header : ", request.headers)
         logout(request)
 
         return Response(status=status.HTTP_200_OK)
@@ -108,8 +109,6 @@ class LogoutView(APIView):
 
 class AllegiesView(APIView):
     permission_classes = [IsAuthenticated]
-
-    # permission_classes = [AllowAny]
 
     def get(self, request: Request) -> Response:
         user = request.user

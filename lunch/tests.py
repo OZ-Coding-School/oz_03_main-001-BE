@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from lunch.models import Lunch, LunchMenu
 from menus.models import Menu
 from menus.serializers import MenuWithDetailSerializer
+from users.models import User
 from utils.test_helper import create_menu
 
 

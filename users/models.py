@@ -39,17 +39,31 @@ class User(AbstractBaseUser, PermissionsMixin, CommonModel):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=15, unique=True)
     id = models.AutoField(primary_key=True)
+    nickname = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=255, blank=True, null=True)
+
+    STORE = 2
+    USER = 1
+
+    STATUS_CHOICES = (
+        (STORE, "store"),
+        (USER, "user"),
+    )
+
+    status = models.IntegerField(choices=STATUS_CHOICES, default=USER)
+
     # PermissionMixin: 권한 관리
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     allergies = models.ManyToManyField(Allergy, blank=True, related_name="users")
 
-    USERNAME_FIELD = "username"  # USERNAME_FIELD로 정의가 되어있는 필드는 unique=True가 필요
+    USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["email"]  # Required_fields를 설정하지 않으면 추가적인 필드를 강제할 수 있습니다.
+    REQUIRED_FIELDS = ["email"]
 
-    objects = UserManager()  # 유저를 생성 및 관리 (유저를 구분해서 관리하기 위해 - 관리자계정, 일반계정)
+    objects = UserManager()
 
     def __str__(self) -> str:  # 핵심 데이터를 볼 수 있게 설정
         return f"email: {self.email}, username: {self.username}"

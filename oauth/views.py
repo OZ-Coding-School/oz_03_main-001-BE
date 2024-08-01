@@ -1,16 +1,11 @@
-import json
 import os
 from typing import Dict, Optional
 
 import requests
-from django.conf import settings
-from django.contrib.auth import logout
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
-from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
@@ -29,7 +24,6 @@ def kakao_login(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods(["GET"])
 def kakao_callback(request: HttpRequest) -> HttpResponse:
-    #  TODO 리프레쉬 검증 로직
     code = request.GET.get("code")
 
     token_data: Dict[str, Optional[str]] = {
@@ -77,10 +71,6 @@ def kakao_callback(request: HttpRequest) -> HttpResponse:
 
     profile_info = profile_response.json()
 
-    print(json.dumps(profile_info))
-
-    # Retrieve or create the user
-    kakao_id = profile_info["id"]
     kakao_email = profile_info.get("kakao_account", {}).get("email")
     kakao_username = profile_info.get("properties", {}).get("nickname")
 
@@ -88,7 +78,6 @@ def kakao_callback(request: HttpRequest) -> HttpResponse:
         email=kakao_email,
         defaults={
             "username": kakao_username,
-            # "password": User.objects.make_random_password(),
         },
     )
 
@@ -97,14 +86,9 @@ def kakao_callback(request: HttpRequest) -> HttpResponse:
         user.set_unusable_password()
         user.save()
 
-    print(user)
-
-    # Generate tokens using SimpleJWT
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)  # type: ignore
     refresh_token = str(refresh)
-
-    print(f"access_token: {access_token}\nrefresh_token: {refresh_token}")
 
     response = redirect(reverse("/"))
     response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
