@@ -1,8 +1,9 @@
-from django.contrib.auth.models import User  # TODO user 수정
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 
+from users.models import User
 from utils.test_helper import create_menu
 
 from .models import Order
@@ -11,10 +12,13 @@ from .serializers import OrderSerializer
 
 class OrderTestCase(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user("test@naver.com", "1234")
-        self.client.login(email="test@naver.com", password="1234")
-        # TODO: token api merge 후 수정
-        self.client.force_authenticate(user=self.user)
+        self.test_user = User.objects.create_user(
+            username="testuser", email="test@example.com", password="testpassword", status=2
+        )
+        refresh = RefreshToken.for_user(self.test_user)
+        self.token = str(refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
         create_menu(name="menu1")
         create_menu(name="menu2")
         create_menu(name="menu3")
@@ -79,12 +83,12 @@ class OrderTestCase(APITestCase):
         for i in range(5):
             serializer = OrderSerializer(data=self.order_data)
             serializer.is_valid()
-            self.order = serializer.save(user=self.user)
+            self.order = serializer.save(user=self.test_user)
 
     def test_order_list_get(self):
         url = reverse("order-list")
 
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(6):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

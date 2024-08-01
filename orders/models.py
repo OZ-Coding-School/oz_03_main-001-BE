@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
 from django.db import models
 
 from common.models import CommonModel
+from users.models import User
 
 
 class Order(CommonModel):

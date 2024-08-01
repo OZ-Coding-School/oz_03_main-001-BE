@@ -1,6 +1,7 @@
 import random
 
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -44,6 +45,7 @@ class LunchList(APIView):
 
 
 class LunchDetail(APIView):
+
     def get(self, request: Request, pk: int) -> Response:
         try:
             lunch = Lunch.objects.get(pk=pk)
@@ -76,6 +78,7 @@ class LunchDetail(APIView):
 
 
 class LunchRandomList(APIView):
+
     def get(self, request: Request) -> Response:
         all_menus = Menu.objects.all()
         bob_menus = [menu for menu in all_menus if menu.category == "bob"]
@@ -84,7 +87,7 @@ class LunchRandomList(APIView):
 
         random_lunch: list[Lunch] = []
 
-        while len(random_lunch) != 2:
+        while len(random_lunch) != 10:
             selected_menus = random.sample(bob_menus, 1) + random.sample(guk_menus, 1) + random.sample(chan_menus, 3)
 
             lunch = Lunch.objects.create(

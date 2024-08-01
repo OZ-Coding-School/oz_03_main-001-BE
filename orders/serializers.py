@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import serializers
 
 from lunch.models import Lunch, LunchMenu
 from lunch.serializers import LunchMenuSerializer
 from orders.models import Order, OrderItem
+from users.models import User
 
 
 class OrderLunchSerializer(serializers.ModelSerializer):
