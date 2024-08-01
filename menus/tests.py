@@ -1,15 +1,24 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.models import Allergy
 from menus.models import Menu, MenuDetailCategory
 from menus.serializers import MenuWithDetailSerializer
+from users.models import User
 from utils.test_helper import create_menu
 
 
 class MenuAPITestCase(APITestCase):
     def setUp(self) -> None:
+        self.test_user = User.objects.create_user(
+            username="testuser", email="test@example.com", password="testpassword", status=2
+        )
+        refresh = RefreshToken.for_user(self.test_user)
+        self.token = str(refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+
         self.menu = create_menu(name="test_menu1")
         create_menu(name="test_menu2")
         create_menu(name="test_menu3")
@@ -77,7 +86,7 @@ class MenuAPITestCase(APITestCase):
         base_url = reverse("menu-list")
         url = f"{base_url}?category=guk&allergy=조개류&search=찌개"
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -87,7 +96,7 @@ class MenuAPITestCase(APITestCase):
         base_url = reverse("menu-list")
         url = f"{base_url}?category=chan&search=돼지"
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
