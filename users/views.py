@@ -41,20 +41,31 @@ class SignupView(APIView):
             return response
 
         except ValidationError as e:
-            error_message = "데이터베이스 무결성 오류가 발생했습니다."
             error_detail = str(e.detail).lower()
+            error_message = "유효성 검사 오류가 발생했습니다."
             if "password" in error_detail:
                 error_message = "비밀번호가 비슷합니다. 다른 비밀번호를 사용해주세요."
             elif "username" in error_detail:
-                error_message = "이미 사용 중인 아이디입니다. 다른 아이디를 사용해주세요."
+                error_message = "유효하지 않은 아이디입니다. 다른 아이디를 사용해주세요."
             elif "email" in error_detail:
-                error_message = "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요."
+                error_message = "유효하지 않은 이메일 주소입니다. 올바른 이메일을 입력해주세요."
+
+            return Response({"error_message": error_message}, status=status.HTTP_400_BAD_REQUEST)
+
+        except IntegrityError as e:
+            error_message = "데이터베이스 무결성 오류가 발생했습니다."
+            error_detail = str(e).lower()
+            if "unique constraint" in error_detail:
+                if "username" in error_detail:
+                    error_message = "이미 사용 중인 아이디입니다. 다른 아이디를 사용해주세요."
+                elif "email" in error_detail:
+                    error_message = "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요."
 
             return Response({"error_message": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
         user = request.user

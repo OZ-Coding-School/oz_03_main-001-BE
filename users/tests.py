@@ -34,6 +34,35 @@ class UserTests(APITestCase):
         self.assertTrue("access_token" in response.cookies)
         self.assertTrue("refresh_token" in response.cookies)
 
+    def test_same_username(self):
+        response = self.client.post(
+            self.signup_url,
+            {"username": "testuser", "email": "test123@example.com", "password": "testpassword"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            "이미 사용 중인 아이디입니다. 다른 아이디를 사용해주세요.", response.json().get("error_message")
+        )
+
+    def test_same_email(self):
+        response = self.client.post(
+            self.signup_url,
+            {"username": "giung", "email": "test@example.com", "password": "testpassword"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요.", response.json().get("error_message")
+        )
+
+    def test_similar_password(self):
+        response = self.client.post(
+            self.signup_url, {"username": "giung", "email": "test123@example.com", "password": "!giung"}, format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual("비밀번호가 비슷합니다. 다른 비밀번호를 사용해주세요.", response.json().get("error_message"))
+
     def test_login(self):
         data = {"username": "testuser", "password": "testpassword"}
         response = self.client.post(self.login_url, data, format="json")
