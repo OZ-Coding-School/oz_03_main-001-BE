@@ -80,6 +80,17 @@ class LunchDetail(APIView):
 class LunchRandomList(APIView):
 
     def get(self, request: Request) -> Response:
+        random_lunch = Lunch.objects.order_by("?")[0:10]
+        serializer = LunchSerializer(random_lunch, many=True)
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+    def post(self, request: Request) -> Response:
+        # if not request.user.is_authenticated or request.user.get_status_display() != "store":
+        #     return Response({"success": False}, status=status.HTTP_403_FORBIDDEN)
         all_menus = Menu.objects.all()
         bob_menus = [menu for menu in all_menus if menu.category == "bob"]
         guk_menus = [menu for menu in all_menus if menu.category == "guk"]
@@ -87,7 +98,7 @@ class LunchRandomList(APIView):
 
         random_lunch: list[Lunch] = []
 
-        while len(random_lunch) != 10:
+        while len(random_lunch) != 5:
             selected_menus = random.sample(bob_menus, 1) + random.sample(guk_menus, 1) + random.sample(chan_menus, 3)
 
             lunch = Lunch.objects.create(
@@ -111,5 +122,5 @@ class LunchRandomList(APIView):
 
         return Response(
             serializer.data,
-            status=status.HTTP_200_OK,
+            status=status.HTTP_201_CREATED,
         )

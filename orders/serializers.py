@@ -10,6 +10,7 @@ from users.models import User
 class OrderLunchSerializer(serializers.ModelSerializer):
     menus = LunchMenuSerializer(many=True, write_only=True)
     lunch_menu = LunchMenuSerializer(many=True, read_only=True)
+    id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Lunch
@@ -25,7 +26,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderUserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ["id"]
@@ -62,17 +62,21 @@ class OrderSerializer(serializers.ModelSerializer):
             lunch_data = item_data.pop("lunch")
             menus_data = lunch_data.pop("menus")
 
-            lunch = Lunch.objects.create(**lunch_data)
+            if lunch_data.get("id") is not None:
+                lunch = Lunch.objects.get(id=lunch_data["id"])
 
-            for menu_data in menus_data:
-                lm = LunchMenu.objects.create(
-                    lunch_id=lunch.pk,
-                    menu_id=menu_data["id"],
-                    quantity=menu_data["quantity"],
-                )
+            else:
+                lunch = Lunch.objects.create(**lunch_data)
 
-                lm.kcal = lm.menu.kcal * lm.quantity
-                lm.save()
+                for menu_data in menus_data:
+                    lm = LunchMenu.objects.create(
+                        lunch_id=lunch.pk,
+                        menu_id=menu_data["id"],
+                        quantity=menu_data["quantity"],
+                    )
+
+                    lm.kcal = lm.menu.kcal * lm.quantity
+                    lm.save()
 
             OrderItem.objects.create(order=order, lunch=lunch, **item_data)
 
