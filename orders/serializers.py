@@ -62,7 +62,7 @@ class OrderSerializer(serializers.ModelSerializer):
             lunch_data = item_data.pop("lunch")
             menus_data = lunch_data.pop("menus")
 
-            if lunch_data.get('id') is not None:
+            if lunch_data.get("id") is not None:
                 lunch = Lunch.objects.get(id=lunch_data["id"])
 
             else:
