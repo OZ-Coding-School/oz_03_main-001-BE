@@ -21,34 +21,33 @@ class SignupView(APIView):
     def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponseRedirect | Response:
         try:
             serializer = UserSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-            if serializer.is_valid():
-                user = serializer.save()
+            user = serializer.save()
 
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)  # type: ignore
-                refresh_token = str(refresh)
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)  # type: ignore
+            refresh_token = str(refresh)
 
-                response_data = {
-                    "access_token": access_token,
-                    "refresh_token": refresh_token,
-                    "user": serializer.data,
-                }
+            response_data = {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "user": serializer.data,
+            }
 
-                response = Response(response_data, status=status.HTTP_201_CREATED)
-                response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-                response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
-                return response
+            response = Response(response_data, status=status.HTTP_201_CREATED)
+            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+            return response
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        except IntegrityError as e:
+        except ValidationError as e:
             error_message = "데이터베이스 무결성 오류가 발생했습니다."
-            if "password" in str(e).lower():
+            error_detail = str(e.detail).lower()
+            if "password" in error_detail:
                 error_message = "비밀번호가 비슷합니다. 다른 비밀번호를 사용해주세요."
-            elif "username" in str(e).lower():
+            elif "username" in error_detail:
                 error_message = "이미 사용 중인 아이디입니다. 다른 아이디를 사용해주세요."
-            elif "email" in str(e).lower():
+            elif "email" in error_detail:
                 error_message = "이미 사용 중인 이메일입니다. 다른 이메일을 사용해주세요."
 
             return Response({"error_message": error_message}, status=status.HTTP_400_BAD_REQUEST)
