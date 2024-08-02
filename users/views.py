@@ -65,7 +65,7 @@ class SignupView(APIView):
 
 
 class UserUpdateView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
         user = request.user
