@@ -18,6 +18,10 @@ class MenuAPITestCase(APITestCase):
         refresh = RefreshToken.for_user(self.test_user)
         self.token = str(refresh.access_token)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        allergy_names = ["밀", "돼지고기"]
+        allergies = Allergy.objects.filter(name__in=allergy_names)
+
+        self.test_user.allergies.set(allergies)
 
         self.menu = create_menu(name="test_menu1")
         create_menu(name="test_menu2")
@@ -199,3 +203,12 @@ class MenuAPITestCase(APITestCase):
         self.assertEqual(menu_details.count(), 2)
         self.assertEqual(menu_details.first().allergy.name, "메밀")
         self.assertIsNone(menu_details.last().allergy)
+
+    def test_get_allergy_menu_list(self):
+        base_url = reverse("menu-list")
+        url = f"{base_url}?category=chan&allergy=true"
+
+        with self.assertNumQueries(4):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

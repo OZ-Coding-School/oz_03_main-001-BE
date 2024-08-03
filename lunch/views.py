@@ -1,7 +1,7 @@
 import random
 
+from django.db.models import Prefetch, Subquery
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -80,8 +80,32 @@ class LunchDetail(APIView):
 class LunchRandomList(APIView):
 
     def get(self, request: Request) -> Response:
-        random_lunch = Lunch.objects.order_by("?")[0:10]
-        serializer = LunchSerializer(random_lunch, many=True)
+        allergy = request.GET.get("allergy", "").lower()
+        lunch_queryset = Lunch.objects.all()
+
+        if allergy == "true":
+            if not request.user.is_authenticated:
+                return Response({"message": "로그인 된 유저가 아닙니다"}, status=status.HTTP_403_FORBIDDEN)
+
+            user_allergies = request.user.allergies.all()
+
+            allergen_menus = Menu.objects.filter(menu_details__allergy__in=user_allergies).values("id")
+
+            lunch_queryset = lunch_queryset.exclude(menus__in=Subquery(allergen_menus))
+
+        total_count = lunch_queryset.count()
+        if total_count <= 10:
+            lunch_queryset = lunch_queryset.all()
+        else:
+            random_ids = lunch_queryset.values_list("id", flat=True)
+            random_ids_list = list(random_ids)
+            random.shuffle(random_ids_list)
+            selected_ids = random_ids_list[:10]
+            lunch_queryset = Lunch.objects.filter(id__in=selected_ids)
+
+        lunch_prefetch = Prefetch("lunch_menu", queryset=LunchMenu.objects.select_related("menu"))
+        lunch_queryset = lunch_queryset.prefetch_related(lunch_prefetch)
+        serializer = LunchSerializer(lunch_queryset, many=True)
 
         return Response(
             serializer.data,

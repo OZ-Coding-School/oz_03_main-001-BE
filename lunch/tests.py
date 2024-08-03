@@ -1,10 +1,10 @@
-# from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 
+from common.models import Allergy
 from lunch.models import Lunch, LunchMenu
-from menus.models import Menu
 from menus.serializers import MenuWithDetailSerializer
 from users.models import User
 from utils.test_helper import create_menu
@@ -12,8 +12,17 @@ from utils.test_helper import create_menu
 
 class LunchAPITestCase(APITestCase):
     def setUp(self):
-        user = User.objects.create_user(username="testuser", email="test@naver.com", password="1234")
-        self.client.login(username="testuser", password="1234")
+        self.test_user = User.objects.create_user(
+            username="testuser", email="test@example.com", password="testpassword", status=2
+        )
+
+        refresh = RefreshToken.for_user(self.test_user)
+        self.token = str(refresh.access_token)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        allergy_names = ["밀", "돼지고기"]
+        allergies = Allergy.objects.filter(name__in=allergy_names)
+
+        self.test_user.allergies.set(allergies)
 
         menu1 = create_menu(name="test_menu1")
         menu2 = create_menu(name="test_menu2")
@@ -101,7 +110,7 @@ class LunchAPITestCase(APITestCase):
 
         for i in range(1, 11):
             lunch = Lunch.objects.create(
-                store=user,
+                store=self.test_user,
                 name=f"test Lunch{i}",
                 description="test lunch set",
                 image_url="http://example.com/image.jpg",
@@ -178,5 +187,17 @@ class LunchAPITestCase(APITestCase):
 
     def test_random_lunch_get(self):
         url = reverse("lunch-random")
-        res = self.client.get(url)
+
+        with self.assertNumQueries(4):
+            res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_random_lunch_with_allergy_get(self):
+        base_url = reverse("lunch-random")
+        url = f"{base_url}?allergy=true"
+
+        with self.assertNumQueries(4):
+            res = self.client.get(url)
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)

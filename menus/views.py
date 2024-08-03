@@ -11,14 +11,20 @@ from .serializers import MenuWithDetailSerializer
 class MenuList(APIView):
 
     def get(self, request: Request) -> Response:
-
         page = int(request.GET.get("page", "1"))
         size = int(request.GET.get("size", "10"))
         category = request.GET.get("category", "bob").lower()
-        allergies = request.GET.get("allergy", "").lower().split(",")
-        allergies = [allergy.strip() for allergy in allergies if allergy.strip()]
+        allergy = request.GET.get("allergy", "").lower()
         search = request.GET.get("search", "").lower()
         offset = (page - 1) * size
+
+        allergies: list[int] = []
+
+        if allergy == "true":
+            if not request.user.is_authenticated:
+                return Response({"message": "로그인 된 유저가 아닙니다"}, status=status.HTTP_403_FORBIDDEN)
+
+            allergies = [aller.id for aller in request.user.allergies.all()]
 
         if page < 1:
             return Response("page input error", status=status.HTTP_400_BAD_REQUEST)
@@ -30,7 +36,7 @@ class MenuList(APIView):
 
         if allergies:
             menus = menus.annotate(
-                allergy_count=Count("menu_details__allergy", filter=Q(menu_details__allergy__name__in=allergies))
+                allergy_count=Count("menu_details__allergy", filter=Q(menu_details__allergy__id__in=allergies))
             ).filter(allergy_count=0)
 
         if search:
