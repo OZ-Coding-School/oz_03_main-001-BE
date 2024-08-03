@@ -36,8 +36,8 @@ class SignupView(APIView):
             }
 
             response = Response(response_data, status=status.HTTP_201_CREATED)
-            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-            response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie("access_token", access_token, httponly=False, secure=True, samesite="Lax")
+            response.set_cookie("refresh_token", refresh_token, httponly=False, secure=True, samesite="Lax")
             return response
 
         except ValidationError as e:
@@ -113,8 +113,8 @@ class LoginView(APIView):
             }
 
             response = Response(response_data, status=status.HTTP_200_OK)
-            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-            response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie("access_token", access_token, httponly=False, secure=True, samesite="Lax")
+            response.set_cookie("refresh_token", refresh_token, httponly=False, secure=True, samesite="Lax")
             return response
 
         else:

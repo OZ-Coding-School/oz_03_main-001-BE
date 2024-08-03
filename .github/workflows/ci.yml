@@ -1,9 +1,6 @@
 name: Dosirock CI
 
 on:
-  push:
-    branches:
-      - develop
   pull_request:
 
 jobs:
