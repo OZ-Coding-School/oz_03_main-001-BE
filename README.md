@@ -4,7 +4,7 @@
 ![python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
 ![postgres](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![django-rest-framework]https://camo.githubusercontent.com/49d50160feccbab47d854fc12e5718a3c9860cc8f6087e2744cebeca4fdac08b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446a616e676f253230526573742532304672616d65776f726b2d3039324532303f7374796c653d666f722d7468652d6261646765266c6f676f3d646a616e676f266c6f676f436f6c6f723d7768697465
+![DRF](https://camo.githubusercontent.com/49d50160feccbab47d854fc12e5718a3c9860cc8f6087e2744cebeca4fdac08b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f446a616e676f253230526573742532304672616d65776f726b2d3039324532303f7374796c653d666f722d7468652d6261646765266c6f676f3d646a616e676f266c6f676f436f6c6f723d7768697465)
 <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
 <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 <img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=Amazon Web Services&logoColor=white"/>
