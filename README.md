@@ -30,8 +30,11 @@ https://profile-table-md.vercel.app/
 -  **기본요구사항 :'24.07.09 ~ '24.08.05**
 
 ## 👤멤버 구성
-1. Gomnonix
-2. im-niber
+
+### Team
+|<img src="https://avatars.githubusercontent.com/u/66784492?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/164334686?v=4" width="150" height="150"/>|
+|:-:|:-:|
+|GyuJae Jo<br/>[@im-niber](https://github.com/im-niber)|[@Gomnonix](https://github.com/Gomnonix)|
 
 
 ## 📔프로젝트 내용
