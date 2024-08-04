@@ -41,12 +41,17 @@
 
 
 ### 더 만들어볼 기능
-- 회원가입 시 이메일 인증 기능 추가
-- 사용자 프로필 사진 등록
-- 업체 등록하는 기능
-- 커뮤니티 기능 구
+- 회원가입 시 이메일 인증 기능 구현
+- 사용자 프로필 사진 등록 기능 구현
+- 업체 등록하는 기능 구현
+- 커뮤니티 기능 구현
 
-  
+## ERD
+![스크린샷 2024-08-04 222122](https://github.com/user-attachments/assets/d5f07fb9-fb94-4bc5-a769-ba9736343038)
+
+## Architecture
+![dosirock-CloudCraft ap-northeast-2](https://github.com/user-attachments/assets/8eb5bc12-e6c3-4566-a8b9-563873b02cde)
+
 
 
 
