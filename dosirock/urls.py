@@ -4,6 +4,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from . import views
+# TODO dosirock/views.py 삭제하고 path("", views.index, name="/"), 이 부분 변경
 
 
 def hello_test(request: HttpRequest) -> HttpResponse:

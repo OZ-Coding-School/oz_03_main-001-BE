@@ -90,6 +90,7 @@ def kakao_callback(request: HttpRequest) -> HttpResponse:
     access_token = str(refresh.access_token)  # type: ignore
     refresh_token = str(refresh)
 
+    # TODO response = redirect(reverse("/")) -> response = redirect("https://dosirock.store) ec2에서 변경을 함
     response = redirect(reverse("/"))
     response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
     response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
