@@ -1,7 +1,7 @@
 # dosirock도 ROCk이다!!!!
 
 ## ⚙️ 사용 기술
-![django]https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white
+![django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
 
 
 ## 🗓프로젝트 기간
