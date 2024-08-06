@@ -4,7 +4,6 @@ from typing import Dict, Optional
 import requests
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -82,17 +81,33 @@ def kakao_callback(request: HttpRequest) -> HttpResponse:
     )
 
     if created:
-
+        response = redirect("https://dosirock.store/all")
         user.set_unusable_password()
         user.save()
+    else:
+        response = redirect("https://dosirock.store")
 
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)  # type: ignore
     refresh_token = str(refresh)
 
-    response = redirect(reverse("/"))
-    response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-    response.set_cookie("refresh_token", refresh_token, httponly=True, secure=True, samesite="Lax")
+    response.set_cookie(
+        "access_token",
+        access_token,
+        httponly=False,
+        secure=True,
+        samesite="Lax",
+        domain=".dosirock.store",
+    )
+
+    response.set_cookie(
+        "refresh_token",
+        refresh_token,
+        httponly=False,
+        secure=True,
+        samesite="Lax",
+        domain=".dosirock.store",
+    )
 
     return response
 
