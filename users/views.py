@@ -113,8 +113,23 @@ class LoginView(APIView):
             }
 
             response = Response(response_data, status=status.HTTP_200_OK)
-            response.set_cookie("access_token", access_token, httponly=False, secure=True, samesite="Lax")
-            response.set_cookie("refresh_token", refresh_token, httponly=False, secure=True, samesite="Lax")
+            response.set_cookie(
+                "access_token",
+                access_token,
+                httponly=False,
+                secure=True,
+                samesite="Lax",
+                domain=".dosirock.store",
+            )
+
+            response.set_cookie(
+                "refresh_token",
+                refresh_token,
+                httponly=False,
+                secure=True,
+                samesite="Lax",
+                domain=".dosirock.store",
+            )
             return response
 
         else:
