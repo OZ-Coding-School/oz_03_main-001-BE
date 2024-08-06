@@ -2,8 +2,6 @@
 
 https://dosirock.store/
 
-https://profile-table-md.vercel.app/
-
 ## ⚙️ 사용 기술
 
 ### BackEnd
@@ -27,14 +25,14 @@ https://profile-table-md.vercel.app/
 
 
 ## 🗓프로젝트 기간
--  **기본요구사항 :'24.07.09 ~ '24.08.05**
+-  **기본요구사항 : 24.07.09 ~ 24.08.05**
 
 ## 👤멤버 구성
 
 ### Team
-|<img src="https://avatars.githubusercontent.com/u/66784492?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/164334686?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/164320612?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/164306935?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/89819295?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/135595326?v=4" width="150" height="150"/>|
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|GyuJae Jo<br/>[@im-niber](https://github.com/im-niber)|[@Gomnonix](https://github.com/Gomnonix)|2_현주<br/>[@Yi-HyeonJu](https://github.com/Yi-HyeonJu)|doin-N<br/>[@doin-N](https://github.com/doin-N)|[@Supernova-428](https://github.com/Supernova-428)|소빈<br/>[@sobinibani](https://github.com/sobinibani)|
+|<img src="https://avatars.githubusercontent.com/u/66784492?v=4" width="150" height="150"/>|<img src="https://avatars.githubusercontent.com/u/164334686?v=4" width="150" height="150"/>|
+|:-:|:-:|
+|[@im-niber](https://github.com/im-niber)|[@Gomnonix](https://github.com/Gomnonix)|
 
 
 ## 📔프로젝트 내용
